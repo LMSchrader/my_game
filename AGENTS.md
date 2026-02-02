@@ -8,13 +8,6 @@
 - `npm run preview` - Preview production build locally
 - `npm run lint` - Run ESLint on all files
 
-### Testing
-No test framework is currently configured. When adding tests, consider:
-- Installing `vitest` for unit testing with Vite integration
-- Install `@testing-library/react` for component testing
-- Add test script to package.json: `"test": "vitest"` or `"test": "vitest run"`
-- Run single test: `npm test -- path/to/test.spec.ts` or `npm test -- -t "test name"`
-
 ## Code Style Guidelines
 
 ### TypeScript Configuration
@@ -81,6 +74,3 @@ No test framework is currently configured. When adding tests, consider:
 - TypeScript 5.9.3
 - Vite 7.2.4
 - When adding new dependencies, use exact versions ( caret ^ is fine in deps.lock)
-
-### Git Ignore
-Never commit: node_modules, dist, dist-ssr, logs, .local files, .DS_Store
