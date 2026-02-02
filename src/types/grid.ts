@@ -12,6 +12,7 @@ export interface Tile {
 export interface Unit {
   id: string
   name: string
+  className: 'Warrior' | 'Archer' | 'Shaman'
   team: 'player' | 'enemy'
   strength: number
   armor: number

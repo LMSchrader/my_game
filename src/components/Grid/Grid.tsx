@@ -1,11 +1,12 @@
 import { useMemo } from 'react'
 import { useGrid } from '../../hooks/useGrid'
-import { hexToPixel } from '../../utils/hexUtils'
-import Tile from './Tile'
+import { hexToPixel, hexKey } from '../../utils/hexUtils'
+import TileComponent from './Tile'
+import type { Tile } from '../../types/grid'
 import './HexGrid.css'
 
 function Grid() {
-  const { tiles, setHoveredTile, selectedTile, setSelectedTile } = useGrid()
+  const { tiles, selectedUnit, setHoveredTile, setSelectedTile, selectUnit, moveUnit, resetTileStates, setSelectedUnit, showAttackRange, executeStrengthAttack, deselectUnit } = useGrid()
 
   const { sortedTiles, gridOffset } = useMemo(() => {
     const tileArray = Array.from(tiles.values()).sort((a, b) => {
@@ -35,11 +36,29 @@ function Grid() {
     }
   }, [tiles])
 
-  const handleTileClick = (coord: { q: number; r: number }) => {
-    if (selectedTile && selectedTile.q === coord.q && selectedTile.r === coord.r) {
-      setSelectedTile(null)
+  const handleTileClick = (tile: Tile) => {
+    const clickedTile = tiles.get(hexKey(tile.coord))
+    if (!clickedTile) return
+
+    if (clickedTile.state === 'move-target' && selectedUnit) {
+      const unitTile = Array.from(tiles.values()).find((t) => t.unit?.id === selectedUnit.id)
+      if (unitTile) {
+        moveUnit(selectedUnit.id, unitTile.coord, tile.coord)
+        showAttackRange(selectedUnit, tile.coord)
+        setSelectedTile(tile.coord)
+      }
+    } else if (clickedTile.state === 'attack-target' && selectedUnit && clickedTile.unit) {
+      executeStrengthAttack(selectedUnit, clickedTile.unit.id)
+      deselectUnit()
+    } else if (clickedTile.unit && clickedTile.unit.team === 'player') {
+      if (!clickedTile.unit.hasActed) {
+        selectUnit(clickedTile.unit.id)
+        setSelectedTile(tile.coord)
+      }
     } else {
-      setSelectedTile(coord)
+      resetTileStates()
+      setSelectedUnit(null)
+      setSelectedTile(null)
     }
   }
 
@@ -54,11 +73,11 @@ function Grid() {
   return (
     <div className="hex-grid">
       {sortedTiles.map((tile) => (
-        <Tile
+        <TileComponent
           key={`${tile.coord.q},${tile.coord.r}`}
           tile={tile}
           gridOffset={gridOffset}
-          onClick={() => handleTileClick(tile.coord)}
+          onClick={() => handleTileClick(tile)}
           onMouseEnter={() => handleTileHover(tile.coord)}
           onMouseLeave={handleTileLeave}
         />

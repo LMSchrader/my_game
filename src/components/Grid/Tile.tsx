@@ -5,7 +5,7 @@ import './HexGrid.css'
 interface TileProps {
   tile: Tile
   gridOffset: { centerX: number; centerY: number }
-  onClick: () => void
+  onClick: (tile: Tile) => void
   onMouseEnter: () => void
   onMouseLeave: () => void
 }
@@ -38,7 +38,7 @@ function TileComponent({ tile, gridOffset, onClick, onMouseEnter, onMouseLeave }
         left: `${finalX}px`,
         top: `${finalY}px`
       } as React.CSSProperties}
-      onClick={onClick}
+      onClick={() => onClick(tile)}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
