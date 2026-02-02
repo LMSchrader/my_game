@@ -77,6 +77,9 @@ export function GridProvider({ children, cols = 10, rows = 10 }: GridProviderPro
       if (id.includes('warrior_0')) return { q: -1, r: 9 }
       if (id.includes('archer_0')) return { q: 0, r: 9 }
       if (id.includes('warrior_1')) return { q: -2, r: 9 }
+      if (id.includes('warrior_2')) return { q: -2, r: 4 }
+      if (id.includes('warrior_3')) return { q: 1, r: 3 }
+      if (id.includes('archer_1')) return { q: 2, r: 2 }
     }
     return null
   }

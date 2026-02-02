@@ -85,8 +85,8 @@ export function createStartingUnits(): Map<string, Unit> {
   playerWarriors.forEach((u) => unitMap.set(u.id, u))
   playerArchers.forEach((u) => unitMap.set(u.id, u))
   
-  const enemyWarriors = createWarriors(2, 'enemy')
-  const enemyArchers = createArchers(1, 'enemy')
+  const enemyWarriors = createWarriors(4, 'enemy')
+  const enemyArchers = createArchers(2, 'enemy')
   
   enemyWarriors.forEach((u) => unitMap.set(u.id, u))
   enemyArchers.forEach((u) => unitMap.set(u.id, u))
