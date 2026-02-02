@@ -1,76 +1,83 @@
 # Agent Guide for my_game
 
+This guide provides essential information for agentic coding agents working in this repository.
+
 ## Build Commands
 
-### Development
-- `npm run dev` - Start development server with HMR
-- `npm run build` - Build for production (runs TypeScript check + Vite build)
-- `npm run preview` - Preview production build locally
-- `npm run lint` - Run ESLint on all files
+### Primary Commands
+- `npm run dev` - Start development server
+- `npm run build` - Build for production (runs TypeScript compiler and Vite build)
+- `npm run lint` - Run ESLint to check code quality
+- `npm run preview` - Preview production build
+
+### TypeScript Check
+- `npx tsc -b` - Run TypeScript compiler check only
+
+### Linting
+- `npm run lint` - ESLint check (recommended to run after changes)
+- Note: Project does not currently have tests configured
 
 ## Code Style Guidelines
 
-### TypeScript Configuration
-- Strict mode is enabled (`strict: true`)
-- Target: ES2022, Module: ESNext
-- All linting rules active: noUnusedLocals, noUnusedParameters, noFallthroughCasesInSwitch
-- verbatimModuleSyntax: Use explicit file extensions in imports (`.ts`, `.tsx`)
-- JSX: `react-jsx` automatic runtime (no React imports needed for JSX)
+### Imports
+- Always use `.ts` extension for local imports: `import { logger } from './utils/logger.ts'`
+- No extension for external library imports: `import { Application } from 'pixi.js'`
+- Use `import { type ... }` for type-only imports: `import { type HexCoordinates } from '../types/grid.ts'`
+- Group imports: external packages first, then local imports
 
-### Import Style
-- Use named imports for React hooks and utilities: `import { useState, useEffect } from 'react'`
-- Asset imports use double quotes for relative paths: `import logo from './assets/logo.svg'`
-- Node modules imports use single quotes for external dependencies
-- Group imports: React imports → third-party → local modules → CSS files
-- Always use explicit file extensions: `.ts` or `.tsx` (enforced by verbatimModuleSyntax)
+### Formatting
+- No Prettier configured - follow TypeScript/ESLint conventions
+- Use double quotes for strings
+- Use semicolons at end of statements
+- Indent with 2 spaces
+- Trailing commas allowed in multi-line arrays/objects
+
+### Types
+- Explicit parameter types required: `(hex: HexCoordinates) => void`
+- Explicit return types required on all functions: `: void`, `: PixelCoordinates`
+- Use interface for object shapes: `export interface HexCoordinates`
+- Use type alias for union types or complex types
+- `const` variables should include type annotations for clarity
 
 ### Naming Conventions
-- Components: PascalCase (e.g., `UserProfile`, `Button`)
-- Component files: PascalCase for main component exports (e.g., `App.tsx`, `Header.tsx`)
-- Utilities/hooks: camelCase (e.g., `useAuth`, `formatDate`)
-- Variables/functions: camelCase (e.g., `userCount`, `handleSubmit`)
-- Constants: UPPER_SNAKE_CASE (e.g., `API_BASE_URL`, `MAX_RETRIES`)
-- Events: `on{Action}` (e.g., `onClick`, `onSubmit`, `handleChange`)
-- Type definitions: PascalCase (e.g., `UserProps`, `ApiResponse`)
+- Classes: PascalCase (HexGrid, Graphics, Container)
+- Functions/Methods: camelCase (hexToPixel, handleClick, center)
+- Variables/Parameters: camelCase (q, r, hex, pixel)
+- Constants: UPPER_SNAKE_CASE (HEX_SIZE, SQRT3, DEFAULT_CONFIG)
+- Private class members: use `private` modifier with camelCase
+- Type names: PascalCase (HexCoordinates, PixelCoordinates)
 
-### React Patterns
-- Functional components only (no class components)
-- Use hooks for state and side effects
-- Destructure props in component signature
-- Use `const` for component declarations
-- Export default from main component file
+### Class Structure
+- Use explicit access modifiers: `public`, `private`, `protected`
+- Constructor at top after private fields
+- Public methods before private methods
+- Order: private fields, constructor, public methods, private methods
 
 ### Error Handling
-- Always handle promise rejections with `.catch()` or try/catch
-- Use TypeScript's error types for typed error handling
-- Provide meaningful error messages for user-facing errors
-- Log errors appropriately for debugging (consider adding logging library)
-
-### Formatting & Linting
-- Always run `npm run lint` before committing
-- ESLint config includes: TypeScript ESLint, React Hooks, React Refresh
-- Adhere to ESLint warnings/errors
-- No semicolons in Component auto-generated templates (check existing codebase)
-- 2-space indentation for JSX/TSX files
-- Trailing commas in multi-line arrays/objects
+- Use try/catch for async operations with proper Error typing
+- Use optional chaining (`?.`) for null-safe method calls
+- Import logger from `./utils/logger.ts` for logging errors
+- Use `logger.error()`, `logger.debug()`, etc. for different log levels
 
 ### File Organization
-- `src/App.tsx` - Main application component
-- `src/main.tsx` - Application entry point
-- `src/assets/` - Images, SVG files
-- `src/*.css` - Global and component styles
-- Place component files near their usage (co-location preferred)
+- src/types/ - TypeScript interfaces and types
+- src/utils/ - Utility functions and helpers
+- src/grid/ - Grid-related classes and components
+- src/main.ts - Application entry point
 
-### Code Quality
-- Type all function parameters and return types explicitly
-- Avoid `any` types - use `unknown` or proper type definitions
-- Use interfaces for object shapes, type aliases for unions/primitives
-- Prefer `const` over `let` when possible
-- Use template literals for string interpolation
-- Keep functions small and focused (single responsibility)
+### TypeScript Config (tsconfig.app.json)
+- Strict mode enabled - no implicit any
+- Unused locals/parameters must be removed
+- ES2022 target with ESNext modules
+- Bundler module resolution
 
-### Dependencies
-- React 19.2.0, React DOM 19.2.0
-- TypeScript 5.9.3
-- Vite 7.2.4
-- When adding new dependencies, use exact versions ( caret ^ is fine in deps.lock)
+### ESLint Rules
+- Follow @eslint/js and typescript-eslint recommended configs
+- Target ES2022, browser globals enabled
+- Ignore: dist directory
+
+### Code Patterns
+- Use nullish coalescing for fallback values: `import.meta.env.VITE_LOG_LEVEL ?? 'info'`
+- Use array methods with callbacks for transformations
+- Private helper methods should be grouped logically
+- Constants defined at file level or class level before usage
