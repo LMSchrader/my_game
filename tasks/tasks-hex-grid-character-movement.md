@@ -45,21 +45,21 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 2.4 Add mouse click detection to identify clicked hex tiles
   - [x] 2.5 Style hex tiles with high-contrast colors
   - [x] 2.6 Display a hex grid in the UI
-- [ ] 3.0 Implement Character Entity System
-  - [ ] 3.1 Define Character interface with position, movement points, and visual properties
-  - [ ] 3.2 Implement character initialization with default MP and starting positions
-  - [ ] 3.3 Create character rendering logic to display distinct characters on the grid
-  - [ ] 3.4 Add visual indicators for different characters (colors/icons)
-- [ ] 4.0 Implement Movement Range Calculation and Highlighting
-  - [ ] 4.1 Implement hex distance calculation (adjacent tile adjacency)
-  - [ ] 4.2 Create movement range calculation function based on remaining MP
-  - [ ] 4.3 Implement tile highlighting system for valid movement destinations
-  - [ ] 4.4 Add collision detection to prevent movement to occupied tiles
-  - [ ] 4.5 Style movement highlights with semi-transparent overlay
-- [ ] 5.0 Implement Interaction Handling and State Management
-  - [ ] 5.1 Create global game state manager to track characters and selection
-  - [ ] 5.2 Implement character selection logic on click
-  - [ ] 5.3 Add character deselection logic when clicking elsewhere
-  - [ ] 5.4 Implement movement execution when clicking on highlighted tiles
-  - [ ] 5.5 Update character position and decrease MP after movement
-  - [ ] 5.6 Add visual indication for selected character (outline/glow)
+- [x] 3.0 Implement Character Entity System
+  - [x] 3.1 Define Character interface with position, movement points, and visual properties
+  - [x] 3.2 Implement character initialization with default MP and starting positions
+  - [x] 3.3 Create character rendering logic to display distinct characters on the grid
+  - [x] 3.4 Add visual indicators for different characters (colors/icons)
+- [x] 4.0 Implement Movement Range Calculation and Highlighting
+  - [x] 4.1 Implement hex distance calculation (adjacent tile adjacency)
+  - [x] 4.2 Create movement range calculation function based on remaining MP
+  - [x] 4.3 Implement tile highlighting system for valid movement destinations
+  - [x] 4.4 Add collision detection to prevent movement to occupied tiles
+  - [x] 4.5 Style movement highlights with semi-transparent overlay
+- [x] 5.0 Implement Interaction Handling and State Management
+  - [x] 5.1 Create global game state manager to track characters and selection
+  - [x] 5.2 Implement character selection logic on click
+  - [x] 5.3 Add character deselection logic when clicking elsewhere
+  - [x] 5.4 Implement movement execution when clicking on highlighted tiles
+  - [x] 5.5 Update character position and decrease MP after movement
+  - [x] 5.6 Add visual indication for selected character (outline/glow)

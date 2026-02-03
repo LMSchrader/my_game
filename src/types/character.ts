@@ -2,9 +2,15 @@ import { type HexCoordinates } from './grid.ts'
 
 export interface Character {
   id: string
-  position: HexCoordinates
+  hexPosition: HexCoordinates
   movementPoints: number
   maxMovementPoints: number
   color: number
   name: string
+  setPosition(hexPosition: HexCoordinates): void
+  useMovementPoints(points: number): void
+  resetMovementPoints(): void
+  hasEnoughMovementPoints(points: number): boolean
+  setSelected(isSelected: boolean): void
+  isSelected(): boolean
 }
