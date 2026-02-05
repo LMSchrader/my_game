@@ -1,16 +1,10 @@
-import { Container, Text, Assets, Graphics, Sprite } from 'pixi.js'
+import { Container, Text, Assets, Sprite } from 'pixi.js'
 import { type Scene, SceneType } from './types/scene.ts'
 import { logger } from '../utils/logger.ts'
+import { PlayButton } from './PlayButton.ts'
 
 const GAME_TITLE: string = 'My Game'
 const BACKGROUND_PATH: string = '/background.png'
-const BUTTON_TEXT: string = 'PLAY'
-const BUTTON_WIDTH: number = 200
-const BUTTON_HEIGHT: number = 60
-const BUTTON_COLOR: number = 0x4ade80
-const BUTTON_HOVER_COLOR: number = 0x22c55e
-const BUTTON_STROKE_COLOR: number = 0xffffff
-const BUTTON_TEXT_COLOR: number = 0xffffff
 const TITLE_COLOR: number = 0xffffff
 const TITLE_SIZE: number = 64
 const TITLE_Y_OFFSET: number = -150
@@ -21,8 +15,7 @@ export class StartScreen extends Container implements Scene {
 
   private background: Sprite | null = null
   private titleText: Text | null = null
-  private playButton: Graphics | null = null
-  private buttonText: Text | null = null
+  private playButton: PlayButton | null = null
   private onPlayClick: (() => void) | null = null
 
   constructor(onPlayClick: () => void) {
@@ -90,56 +83,9 @@ export class StartScreen extends Container implements Scene {
   }
 
   private createPlayButton(): void {
-    const button: Graphics = new Graphics()
-    button.rect(-BUTTON_WIDTH / 2, -BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT)
-    button.fill(BUTTON_COLOR)
-    button.stroke({ width: 3, color: BUTTON_STROKE_COLOR })
-    button.eventMode = 'static'
-    button.cursor = 'pointer'
-
-    button.on('pointerdown', this.handlePlayButtonClick.bind(this))
-    button.on('pointerover', this.handleButtonHover.bind(this))
-    button.on('pointerout', this.handleButtonOut.bind(this))
-
-    this.playButton = button
-    this.addChild(button)
-
-    this.buttonText = new Text({
-      text: BUTTON_TEXT,
-      style: {
-        fontSize: 28,
-        fill: BUTTON_TEXT_COLOR,
-        fontWeight: 'bold',
-        align: 'center',
-      },
-    })
-    this.buttonText.anchor.set(0.5)
-    this.buttonText.resolution = window.devicePixelRatio || 1
-    this.buttonText.eventMode = 'none'
-    button.addChild(this.buttonText)
-  }
-
-  private handlePlayButtonClick(): void {
     if (this.onPlayClick) {
-      this.onPlayClick()
-    }
-  }
-
-  private handleButtonHover(): void {
-    if (this.playButton) {
-      this.playButton.clear()
-      this.playButton.rect(-BUTTON_WIDTH / 2, -BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT)
-      this.playButton.fill(BUTTON_HOVER_COLOR)
-      this.playButton.stroke({ width: 3, color: BUTTON_STROKE_COLOR })
-    }
-  }
-
-  private handleButtonOut(): void {
-    if (this.playButton) {
-      this.playButton.clear()
-      this.playButton.rect(-BUTTON_WIDTH / 2, -BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT)
-      this.playButton.fill(BUTTON_COLOR)
-      this.playButton.stroke({ width: 3, color: BUTTON_STROKE_COLOR })
+      this.playButton = new PlayButton(this.onPlayClick)
+      this.addChild(this.playButton)
     }
   }
 
@@ -168,6 +114,5 @@ export class StartScreen extends Container implements Scene {
       this.playButton.destroy()
       this.playButton = null
     }
-    this.buttonText = null
   }
 }
