@@ -6,7 +6,7 @@ import {
   pixelToHex,
   hexToKey,
 } from '../utils/hexGridUtils.ts'
-import { HEX_SIZE, DEFAULT_GRID_CONFIG, Colors } from '../config/config.ts'
+import { HEX_SIZE, HIGHLIGHT_OVERLAY_SIZE, DEFAULT_GRID_CONFIG, Colors } from '../config/config.ts'
 
 export interface HexGridConfig {
   rows: number
@@ -162,7 +162,7 @@ export class HexGrid extends Container {
     highlight.eventMode = 'none'
 
     const center: PixelCoordinates = this.getCenteredHexPosition(hex)
-    const corners: PixelCoordinates[] = getHexCorners(center, HEX_SIZE - 2)
+    const corners: PixelCoordinates[] = getHexCorners(center, HIGHLIGHT_OVERLAY_SIZE)
 
     highlight.moveTo(corners[0].x, corners[0].y)
     for (let i = 1; i < corners.length; i++) {
