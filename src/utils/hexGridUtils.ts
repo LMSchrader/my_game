@@ -1,4 +1,4 @@
-import { type HexCoordinates, type PixelCoordinates } from '../types/grid.ts'
+import { type HexCoordinates, type PixelCoordinates } from '../grid/types/grid.ts'
 import { HEX_SIZE } from '../config/config.ts'
 
 export const SQRT3: number = Math.sqrt(3)
@@ -68,4 +68,13 @@ export function getHexCorners(center: PixelCoordinates, size: number): PixelCoor
     corners.push(getHexCorner(center, size, i))
   }
   return corners
+}
+
+export function hexToKey(hex: HexCoordinates): string {
+  return `${hex.q},${hex.r}`
+}
+
+export function keyToHex(key: string): HexCoordinates {
+  const parts: string[] = key.split(',')
+  return { q: parseInt(parts[0], 10), r: parseInt(parts[1], 10) }
 }

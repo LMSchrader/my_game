@@ -1,6 +1,6 @@
 import { Container, Sprite, Assets, Graphics } from 'pixi.js'
-import { type Character } from '../types/character.ts'
-import { type HexCoordinates, type PixelCoordinates } from '../types/grid.ts'
+import { type Character } from './types/character.ts'
+import { type HexCoordinates, type PixelCoordinates } from '../grid/types/grid.ts'
 import { hexToPixel, getHexCorners } from '../utils/hexGridUtils.ts'
 import { HEX_SIZE, DEFAULT_MOVEMENT_POINTS, DEFAULT_SPRITE_SCALE, Colors } from '../config/config.ts'
 
@@ -23,7 +23,7 @@ export class CharacterEntity extends Container implements Character {
   private selectionHighlight: Graphics | null = null
   private _isSelected: boolean = false
 
-  constructor(config: {
+  private constructor(config: {
     id: string
     hexPosition?: HexCoordinates
     movementPoints?: number
@@ -45,7 +45,6 @@ export class CharacterEntity extends Container implements Character {
     this.positionProvider = config.positionProvider ?? null
     this.spritePath = config.spritePath
 
-    this.initSprite()
     this.createSelectionHighlight()
     this.updateSpritePosition()
   }
@@ -61,6 +60,22 @@ export class CharacterEntity extends Container implements Character {
     } catch (error) {
       console.error(`Failed to load sprite for character ${this.id}:`, error)
     }
+  }
+
+  public static async create(config: {
+    id: string
+    hexPosition?: HexCoordinates
+    movementPoints?: number
+    maxMovementPoints?: number
+    color?: number
+    name?: string
+    spriteScale?: number
+    positionProvider?: PositionProvider
+    spritePath: string
+  }): Promise<CharacterEntity> {
+    const entity = new CharacterEntity(config)
+    await entity.initSprite()
+    return entity
   }
 
   public setPosition(hexPosition: HexCoordinates): void {

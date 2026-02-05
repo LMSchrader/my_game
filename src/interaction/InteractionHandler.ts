@@ -1,5 +1,5 @@
-import { type HexCoordinates } from '../types/grid.ts'
-import { type Character } from '../types/character.ts'
+import { type HexCoordinates } from '../grid/types/grid.ts'
+import { type Character } from '../character/types/character.ts'
 import { getValidMovementTiles } from '../movement/MovementSystem.ts'
 import { getHexDistance } from '../utils/hexGridUtils.ts'
 import { GameState } from '../state/GameState.ts'
@@ -108,9 +108,5 @@ export class InteractionHandler {
 
   private clearHighlights(): void {
     this.tileHighlighter([], Colors.HIGHLIGHT)
-  }
-
-  public getSelectedCharacter(): Character | undefined {
-    return this.gameState.getSelectedCharacter()
   }
 }
