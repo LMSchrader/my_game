@@ -1,6 +1,5 @@
 import { type Character } from '../character/types/character.ts'
 import { type HexCoordinates } from '../grid/types/grid.ts'
-import { getHexDistance } from '../utils/hexGridUtils.ts'
 
 export class GameState {
   private characters: Map<string, Character> = new Map()
@@ -48,24 +47,6 @@ export class GameState {
 
   public isCharacterSelected(): boolean {
     return this.selectedCharacterId !== null
-  }
-
-  public moveCharacter(characterId: string, newHexPosition: HexCoordinates): boolean {
-    const character = this.characters.get(characterId)
-    if (!character) {
-      return false
-    }
-
-    const oldPosition = character.hexPosition
-    const distance = getHexDistance(oldPosition, newHexPosition)
-
-    if (distance > character.movementPoints) {
-      return false
-    }
-
-    character.setPosition(newHexPosition)
-    character.useMovementPoints(distance)
-    return true
   }
 
   public resetAllMovementPoints(): void {
