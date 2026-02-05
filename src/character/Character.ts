@@ -96,8 +96,8 @@ export class CharacterEntity extends Container implements Character {
     }
   }
 
-  public useMovementPoints(points: number): void {
-    this.movementPoints = Math.max(0, this.movementPoints - points)
+  public useMovementPoints(): void {
+    this.movementPoints = 0
   }
 
   public resetMovementPoints(): void {
