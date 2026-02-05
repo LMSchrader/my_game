@@ -3,6 +3,7 @@ import { type Character } from '../types/character.ts'
 import { getValidMovementTiles } from '../movement/MovementSystem.ts'
 import { getHexDistance } from '../utils/hexGridUtils.ts'
 import { GameState } from '../state/GameState.ts'
+import { Colors } from '../config/config.ts'
 
 export type GridBoundsChecker = (hex: HexCoordinates) => boolean
 export type TileHighlighter = (hexes: HexCoordinates[], color: number) => void
@@ -102,11 +103,11 @@ export class InteractionHandler {
       this.gridBoundsChecker
     )
 
-    this.tileHighlighter(movementTiles, 0x4ade80)
+    this.tileHighlighter(movementTiles, Colors.HIGHLIGHT)
   }
 
   private clearHighlights(): void {
-    this.tileHighlighter([], 0x4ade80)
+    this.tileHighlighter([], Colors.HIGHLIGHT)
   }
 
   public getSelectedCharacter(): Character | undefined {

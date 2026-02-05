@@ -1,10 +1,8 @@
 import { Container, Sprite, Assets, Graphics } from 'pixi.js'
 import { type Character } from '../types/character.ts'
 import { type HexCoordinates, type PixelCoordinates } from '../types/grid.ts'
-import { hexToPixel, getHexCorners, HEX_SIZE } from '../utils/hexGridUtils.ts'
-
-const DEFAULT_MOVEMENT_POINTS: number = 5
-const DEFAULT_SPRITE_SCALE: number = 0.5
+import { hexToPixel, getHexCorners } from '../utils/hexGridUtils.ts'
+import { HEX_SIZE, DEFAULT_MOVEMENT_POINTS, DEFAULT_SPRITE_SCALE, Colors } from '../config/config.ts'
 
 export interface PositionProvider {
   getCenteredHexPosition: (hex: HexCoordinates) => PixelCoordinates
@@ -108,7 +106,7 @@ export class CharacterEntity extends Container implements Character {
     }
 
     this.selectionHighlight.closePath()
-    this.selectionHighlight.stroke({ width: 4, color: 0xffd700 })
+    this.selectionHighlight.stroke({ width: 4, color: Colors.SELECTED })
   }
 
   public setSelected(isSelected: boolean): void {
