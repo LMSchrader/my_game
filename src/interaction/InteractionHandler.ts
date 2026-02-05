@@ -144,4 +144,13 @@ export class InteractionHandler {
   private isPlayerTeam(character: Character): boolean {
     return character.team === Team.TeamA
   }
+
+  public handleGlobalClick(): void {
+    const selectedCharacter = this.gameState.getSelectedCharacter()
+    if (selectedCharacter) {
+      selectedCharacter.setSelected(false)
+      this.gameState.deselectCharacter()
+      this.clearHighlights()
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { Container } from 'pixi.js'
+import {Assets, Container, Sprite} from 'pixi.js'
 import { type Scene, SceneType } from './types/scene.ts'
 import { HexGrid } from '../grid/HexGrid.ts'
 import { CharacterEntity, Team } from '../character/Character.ts'
@@ -11,9 +11,12 @@ import { TurnManager } from '../turn/TurnManager.ts'
 import { EndTurnButton } from '../turn/EndTurnButton.ts'
 import { logger } from '../utils/logger.ts'
 
+const BACKGROUND_PATH: string = '/background.png'
+
 export class GameScene extends Container implements Scene {
   public readonly type: SceneType = SceneType.GAME
 
+  private background: Sprite | null = null
   private hexGrid: HexGrid | null = null
   private gameState: GameState | null = null
   private interactionHandler: InteractionHandler | null = null
@@ -23,6 +26,7 @@ export class GameScene extends Container implements Scene {
   private isInitialized: boolean = false
 
   public async onEnter(): Promise<void> {
+    await this.loadBackground()
     if (!this.isInitialized) {
       await this.initializeGame()
       this.isInitialized = true
@@ -71,12 +75,31 @@ export class GameScene extends Container implements Scene {
   }
 
   public onResize(width: number, height: number): void {
+    if (this.background) {
+      const scale = Math.max(width / this.background.width, height / this.background.height)
+      this.background.scale.set(scale)
+      this.background.x = width / 2
+      this.background.y = height / 2
+    }
     if (this.hexGrid) {
       this.hexGrid.center(width, height)
     }
     if (this.endTurnButton) {
       this.endTurnButton.x = width / 2 - 100
       this.endTurnButton.y = height - 100
+    }
+  }
+
+  private async loadBackground(): Promise<void> {
+    try {
+      const texture = await Assets.load(BACKGROUND_PATH)
+      this.background = new Sprite(texture)
+      this.background.anchor.set(0.5)
+      this.background.eventMode = 'static'
+      this.addChildAt(this.background, 0)
+      this.background.on('pointerdown', this.handleGlobalClick.bind(this))
+    } catch (error) {
+      logger.error('Failed to load background:', error)
     }
   }
 
@@ -176,5 +199,10 @@ export class GameScene extends Container implements Scene {
   private addCharacter(character: CharacterEntity): void {
     this.hexGrid!.addChild(character)
     this.gameState!.addCharacter(character)
+  }
+
+  private handleGlobalClick(): void {
+    // Deselect character when clicking anywhere outside hex tiles
+    this.interactionHandler?.handleGlobalClick()
   }
 }
