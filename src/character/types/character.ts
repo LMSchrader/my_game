@@ -5,7 +5,6 @@ export interface Character {
   hexPosition: HexCoordinates
   movementPoints: number
   maxMovementPoints: number
-  color: number
   name: string
   setPosition(hexPosition: HexCoordinates): void
   useMovementPoints(points: number): void

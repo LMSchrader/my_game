@@ -13,7 +13,6 @@ export class CharacterEntity extends Container implements Character {
   public hexPosition: HexCoordinates
   public movementPoints: number
   public readonly maxMovementPoints: number
-  public readonly color: number
   public readonly name: string
 
   private sprite: Sprite | null = null
@@ -28,7 +27,6 @@ export class CharacterEntity extends Container implements Character {
     hexPosition?: HexCoordinates
     movementPoints?: number
     maxMovementPoints?: number
-    color?: number
     name?: string
     spriteScale?: number
     positionProvider?: PositionProvider
@@ -39,7 +37,6 @@ export class CharacterEntity extends Container implements Character {
     this.hexPosition = config.hexPosition ?? { q: 0, r: 0 }
     this.movementPoints = config.movementPoints ?? DEFAULT_MOVEMENT_POINTS
     this.maxMovementPoints = config.maxMovementPoints ?? this.movementPoints
-    this.color = config.color ?? 0xffffff
     this.name = config.name ?? `Character ${this.id}`
     this.spriteScale = config.spriteScale ?? DEFAULT_SPRITE_SCALE
     this.positionProvider = config.positionProvider ?? null
@@ -55,7 +52,6 @@ export class CharacterEntity extends Container implements Character {
       this.sprite = new Sprite(texture)
       this.sprite.anchor.set(0.5)
       this.sprite.scale.set(this.spriteScale)
-      this.sprite.tint = this.color
       this.addChild(this.sprite)
     } catch (error) {
       console.error(`Failed to load sprite for character ${this.id}:`, error)
@@ -88,12 +84,6 @@ export class CharacterEntity extends Container implements Character {
       ? this.positionProvider.getCenteredHexPosition(this.hexPosition)
       : hexToPixel(this.hexPosition)
     this.position.set(pixel.x, pixel.y)
-  }
-
-  public setColor(color: number): void {
-    if (this.sprite) {
-      this.sprite.tint = color
-    }
   }
 
   public useMovementPoints(): void {
