@@ -9,6 +9,7 @@ import { SpritePaths } from '../config/config.ts'
 import { TurnOrderDisplay } from '../turn/TurnOrderDisplay.ts'
 import { TurnManager } from '../turn/TurnManager.ts'
 import { EndTurnButton } from '../turn/EndTurnButton.ts'
+import { AIController } from '../ai/AIController.ts'
 import { logger } from '../utils/logger.ts'
 
 const BACKGROUND_PATH: string = '/background.png'
@@ -22,6 +23,7 @@ export class GameScene extends Container implements Scene {
   private interactionHandler: InteractionHandler | null = null
   private turnOrderDisplay: TurnOrderDisplay | null = null
   private turnManager: TurnManager | null = null
+  private aiController: AIController | null = null
   private endTurnButton: EndTurnButton | null = null
   private isInitialized: boolean = false
 
@@ -54,6 +56,11 @@ export class GameScene extends Container implements Scene {
       this.removeChild(this.endTurnButton)
       this.endTurnButton.destroy()
       this.endTurnButton = null
+    }
+
+    if (this.aiController) {
+      this.aiController.shutdown()
+      this.aiController = null
     }
 
     if (this.turnManager) {
@@ -152,6 +159,12 @@ export class GameScene extends Container implements Scene {
 
     const allCharacters = this.gameState.getAllCharacters()
     this.turnManager.initializeTurnOrder(allCharacters)
+
+    this.aiController = new AIController(
+      this.gameState,
+      (hex) => this.hexGrid!.isHexInGrid(hex)
+    )
+    this.aiController.initialize(this.turnManager)
 
     this.turnManager.on('turnStart', (character: unknown) => {
       const activeChar = character as Character
