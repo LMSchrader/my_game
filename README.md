@@ -1,5 +1,16 @@
-# Round based tactic game with hex grid
+# Turn based tactic game with hex grid and cards
 
+## Open todos
+- Movement distance does not take obstacles into account
+- Implement cards
+
+## Working with Opencode
+For new features use 
+- /create-prd
+- /generate-tasks
+After implementation run a code review with
+- /review branch (Opencode build in command)
+- or use /code-review if you want more control over the review prompt
 
 ## Expanding the ESLint configuration
 

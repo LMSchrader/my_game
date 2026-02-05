@@ -1,9 +1,15 @@
 import { type HexCoordinates } from '../grid/types/grid.ts'
-import { type Character } from '../character/types/character.ts'
+import { type Character, Team } from '../character/types/character.ts'
 import { getValidMovementTiles } from '../movement/MovementSystem.ts'
 import { getHexDistance } from '../utils/hexGridUtils.ts'
 import { GameState } from '../state/GameState.ts'
 import { Colors } from '../config/config.ts'
+import { logger } from '../utils/logger.ts'
+
+interface TurnProvider {
+  getActiveCharacter(): Character | null
+  isPlayerTurn(): boolean
+}
 
 export type GridBoundsChecker = (hex: HexCoordinates) => boolean
 export type TileHighlighter = (hexes: HexCoordinates[], color: number) => void
@@ -14,17 +20,20 @@ export class InteractionHandler {
   private gridBoundsChecker: GridBoundsChecker
   private tileHighlighter: TileHighlighter
   private highlightChecker: HighlightChecker
+  private turnProvider: TurnProvider
 
   constructor(
     gameState: GameState,
     gridBoundsChecker: GridBoundsChecker,
     tileHighlighter: TileHighlighter,
-    highlightChecker: HighlightChecker
+    highlightChecker: HighlightChecker,
+    turnProvider: TurnProvider
   ) {
     this.gameState = gameState
     this.gridBoundsChecker = gridBoundsChecker
     this.tileHighlighter = tileHighlighter
     this.highlightChecker = highlightChecker
+    this.turnProvider = turnProvider
   }
 
   public handleHexClick(hex: HexCoordinates): void {
@@ -39,7 +48,12 @@ export class InteractionHandler {
   }
 
   private handleCharacterClick(clickedCharacter: Character, selectedCharacter: Character | undefined): void {
-    if (selectedCharacter && selectedCharacter.id === clickedCharacter.id) {
+    if (!this.canSelectCharacter(clickedCharacter)) {
+      logger.warn(`Cannot select ${clickedCharacter.name}: not active character or wrong team`)
+      return
+    }
+
+    if (selectedCharacter?.id === clickedCharacter.id) {
       clickedCharacter.setSelected(false)
       this.gameState.deselectCharacter()
       this.clearHighlights()
@@ -54,6 +68,14 @@ export class InteractionHandler {
   }
 
   private handleEmptyTileClick(hex: HexCoordinates, selectedCharacter: Character): void {
+    if (!this.canSelectCharacter(selectedCharacter)) {
+      logger.warn(`${selectedCharacter.name} cannot move: not active character or wrong team`)
+      selectedCharacter.setSelected(false)
+      this.gameState.deselectCharacter()
+      this.clearHighlights()
+      return
+    }
+
     if (this.isValidMove(hex, selectedCharacter)) {
       this.executeMove(selectedCharacter, hex)
     } else {
@@ -108,5 +130,18 @@ export class InteractionHandler {
 
   private clearHighlights(): void {
     this.tileHighlighter([], Colors.HIGHLIGHT)
+  }
+
+  private canSelectCharacter(character: Character): boolean {
+    return this.isActiveCharacter(character) && this.isPlayerTeam(character)
+  }
+
+  private isActiveCharacter(character: Character): boolean {
+    const activeCharacter = this.turnProvider.getActiveCharacter()
+    return activeCharacter?.id === character.id
+  }
+
+  private isPlayerTeam(character: Character): boolean {
+    return character.team === Team.TeamA
   }
 }

@@ -1,15 +1,15 @@
 import { type HexGridConfig } from '../grid/HexGrid.ts'
 
-// GRID
 export const HEX_SIZE: number = 40
+export const HIGHLIGHT_OVERLAY_SIZE: number = HEX_SIZE - 2
 export const DEFAULT_GRID_CONFIG: HexGridConfig = {
   rows: 8,
   cols: 8,
 }
 
-// MOVEMENT
 export const DEFAULT_MOVEMENT_POINTS: number = 5
 export const DEFAULT_SPRITE_SCALE: number = 0.5
+export const DEFAULT_SPEED: number = 5
 
 export const Colors = {
   SELECTED: 0xffd700,

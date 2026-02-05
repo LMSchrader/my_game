@@ -1,10 +1,15 @@
 import { Container } from 'pixi.js'
 import { type Scene, SceneType } from './types/scene.ts'
 import { HexGrid } from '../grid/HexGrid.ts'
-import { CharacterEntity } from '../character/Character.ts'
+import { CharacterEntity, Team } from '../character/Character.ts'
+import { type Character } from '../character/types/character.ts'
 import { GameState } from '../state/GameState.ts'
 import { InteractionHandler } from '../interaction/InteractionHandler.ts'
-import { Colors, SpritePaths } from '../config/config.ts'
+import { SpritePaths } from '../config/config.ts'
+import { TurnOrderDisplay } from '../turn/TurnOrderDisplay.ts'
+import { TurnManager } from '../turn/TurnManager.ts'
+import { EndTurnButton } from '../turn/EndTurnButton.ts'
+import { logger } from '../utils/logger.ts'
 
 export class GameScene extends Container implements Scene {
   public readonly type: SceneType = SceneType.GAME
@@ -12,6 +17,9 @@ export class GameScene extends Container implements Scene {
   private hexGrid: HexGrid | null = null
   private gameState: GameState | null = null
   private interactionHandler: InteractionHandler | null = null
+  private turnOrderDisplay: TurnOrderDisplay | null = null
+  private turnManager: TurnManager | null = null
+  private endTurnButton: EndTurnButton | null = null
   private isInitialized: boolean = false
 
   public async onEnter(): Promise<void> {
@@ -38,6 +46,23 @@ export class GameScene extends Container implements Scene {
       this.gameState = null
     }
 
+    if (this.endTurnButton) {
+      this.removeChild(this.endTurnButton)
+      this.endTurnButton.destroy()
+      this.endTurnButton = null
+    }
+
+    if (this.turnManager) {
+      this.turnManager.reset()
+      this.turnManager = null
+    }
+
+    if (this.turnOrderDisplay) {
+      this.removeChild(this.turnOrderDisplay)
+      this.turnOrderDisplay.destroy()
+      this.turnOrderDisplay = null
+    }
+
     if (this.hexGrid) {
       this.removeChild(this.hexGrid)
       this.hexGrid.destroy()
@@ -48,6 +73,10 @@ export class GameScene extends Container implements Scene {
   public onResize(width: number, height: number): void {
     if (this.hexGrid) {
       this.hexGrid.center(width, height)
+    }
+    if (this.endTurnButton) {
+      this.endTurnButton.x = width / 2 - 100
+      this.endTurnButton.y = height - 100
     }
   }
 
@@ -61,37 +90,91 @@ export class GameScene extends Container implements Scene {
       id: 'cat-1',
       hexPosition: { q: 0, r: 0 },
       name: 'Whiskers',
-      color: Colors.SELECTED,
+      team: Team.TeamA,
+      speed: 6,
       spriteScale: 5,
       positionProvider: this.hexGrid,
       spritePath: SpritePaths.CHARACTER,
     })
-    this.hexGrid.addChild(character)
-    this.gameState.addCharacter(character)
+    this.addCharacter(character)
 
     const enemy = await CharacterEntity.create({
       id: 'enemy-1',
       hexPosition: { q: 2, r: 1 },
       name: 'Shadow Beast',
-      color: Colors.ENEMY,
+      team: Team.TeamB,
+      speed: 4,
       spriteScale: 5,
       positionProvider: this.hexGrid,
       spritePath: SpritePaths.ENEMY,
     })
-    this.hexGrid.addChild(enemy)
-    this.gameState.addCharacter(enemy)
+    this.addCharacter(enemy)
 
-    if (this.hexGrid && this.gameState) {
+    this.turnManager = TurnManager.getInstance()
+    this.turnOrderDisplay = new TurnOrderDisplay()
+    this.turnOrderDisplay.x = 20
+    this.turnOrderDisplay.y = 20
+    this.addChild(this.turnOrderDisplay)
+
+    this.turnManager.on('turnOrderInitialized', () => {
+      if (this.turnOrderDisplay) {
+        const turnQueue = this.turnManager!.getTurnQueue()
+        this.turnOrderDisplay.updateTurnOrder(turnQueue)
+        const activeCharacter = this.turnManager!.getActiveCharacter()
+        if (activeCharacter) {
+          this.turnOrderDisplay.setActiveCharacter(activeCharacter.id)
+        }
+      }
+    })
+
+    const allCharacters = this.gameState.getAllCharacters()
+    this.turnManager.initializeTurnOrder(allCharacters)
+
+    this.turnManager.on('turnStart', (character: unknown) => {
+      const activeChar = character as Character
+      if (this.turnOrderDisplay && activeChar.id) {
+        this.turnOrderDisplay.setActiveCharacter(activeChar.id)
+      }
+      this.gameState?.getAllCharacters().forEach((char) => {
+        char.setActiveTurn(char.id === activeChar.id)
+      })
+      this.endTurnButton?.updateButtonState()
+    })
+
+    this.turnManager.on('movementPointsReset', (character: unknown) => {
+      const char = character as Character
+      logger.debug(`Movement points reset for ${char.name}: ${char.movementPoints}/${char.maxMovementPoints}`)
+    })
+
+    const activeCharacter = this.turnManager.getActiveCharacter()
+    if (activeCharacter) {
+      this.gameState?.getAllCharacters().forEach((char) => {
+        char.setActiveTurn(char.id === activeCharacter.id)
+      })
+    }
+
+    this.endTurnButton = new EndTurnButton(this.turnManager)
+    this.endTurnButton.x = window.innerWidth / 2 - 100
+    this.endTurnButton.y = window.innerHeight - 100
+    this.addChild(this.endTurnButton)
+
+    if (this.hexGrid && this.gameState && this.turnManager) {
       this.interactionHandler = new InteractionHandler(
         this.gameState,
         (hex) => this.hexGrid!.isHexInGrid(hex),
         (hexes, color) => this.hexGrid!.highlightTiles(hexes, color),
-        (hex) => this.hexGrid!.isTileHighlighted(hex)
+        (hex) => this.hexGrid!.isTileHighlighted(hex),
+        this.turnManager
       )
 
       this.hexGrid.setOnClick((hex) => {
         this.interactionHandler!.handleHexClick(hex)
       })
     }
+  }
+
+  private addCharacter(character: CharacterEntity): void {
+    this.hexGrid!.addChild(character)
+    this.gameState!.addCharacter(character)
   }
 }

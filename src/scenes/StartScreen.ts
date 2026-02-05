@@ -1,5 +1,6 @@
 import { Container, Text, Assets, Graphics, Sprite } from 'pixi.js'
 import { type Scene, SceneType } from './types/scene.ts'
+import { logger } from '../utils/logger.ts'
 
 const GAME_TITLE: string = 'My Game'
 const BACKGROUND_PATH: string = '/background.png'
@@ -69,7 +70,7 @@ export class StartScreen extends Container implements Scene {
       this.background.y = 0
       this.addChildAt(this.background, 0)
     } catch (error) {
-      console.error('Failed to load background:', error)
+      logger.error('Failed to load background:', error)
     }
   }
 
