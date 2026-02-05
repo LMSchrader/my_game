@@ -1,6 +1,6 @@
 import { type HexCoordinates, type PixelCoordinates } from '../types/grid.ts'
+import { HEX_SIZE } from '../config/config.ts'
 
-export const HEX_SIZE: number = 40
 export const SQRT3: number = Math.sqrt(3)
 
 export function hexToPixel(hex: HexCoordinates): PixelCoordinates {

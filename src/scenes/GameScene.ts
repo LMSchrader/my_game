@@ -4,6 +4,7 @@ import { HexGrid } from '../grid/HexGrid.ts'
 import { CharacterEntity } from '../character/Character.ts'
 import { GameState } from '../state/GameState.ts'
 import { InteractionHandler } from '../interaction/InteractionHandler.ts'
+import { Colors, SpritePaths } from '../config/config.ts'
 
 export class GameScene extends Container implements Scene {
   public readonly type: SceneType = SceneType.GAME
@@ -60,10 +61,10 @@ export class GameScene extends Container implements Scene {
       id: 'cat-1',
       hexPosition: { q: 0, r: 0 },
       name: 'Whiskers',
-      color: 0xffd700,
+      color: Colors.SELECTED,
       spriteScale: 5,
       positionProvider: this.hexGrid,
-      spritePath: '/character.png',
+      spritePath: SpritePaths.CHARACTER,
     })
     this.hexGrid.addChild(character)
     this.gameState.addCharacter(character)
@@ -72,10 +73,10 @@ export class GameScene extends Container implements Scene {
       id: 'enemy-1',
       hexPosition: { q: 2, r: 1 },
       name: 'Shadow Beast',
-      color: 0xff0000,
+      color: Colors.ENEMY,
       spriteScale: 5,
       positionProvider: this.hexGrid,
-      spritePath: '/enemy.png',
+      spritePath: SpritePaths.ENEMY,
     })
     this.hexGrid.addChild(enemy)
     this.gameState.addCharacter(enemy)

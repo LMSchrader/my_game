@@ -4,18 +4,13 @@ import {
   hexToPixel,
   getHexCorners,
   pixelToHex,
-  HEX_SIZE,
 } from '../utils/hexGridUtils.ts'
 import { hexToKey } from '../movement/MovementSystem.ts'
+import { HEX_SIZE, DEFAULT_GRID_CONFIG, Colors } from '../config/config.ts'
 
 export interface HexGridConfig {
   rows: number
   cols: number
-}
-
-const DEFAULT_CONFIG: HexGridConfig = {
-  rows: 8,
-  cols: 8,
 }
 
 export class HexGrid extends Container {
@@ -26,7 +21,7 @@ export class HexGrid extends Container {
   private centerX: number = 0
   private centerY: number = 0
 
-  constructor(config: HexGridConfig = DEFAULT_CONFIG) {
+  constructor(config: HexGridConfig = DEFAULT_GRID_CONFIG) {
     super()
     this.config = config
     this.setupEventListeners()
@@ -126,8 +121,8 @@ export class HexGrid extends Container {
     }
 
     graphics.closePath()
-    graphics.fill(0x4a5568)
-    graphics.stroke({ width: 1, color: 0x718096 })
+    graphics.fill(Colors.TILE_FILL)
+    graphics.stroke({ width: 1, color: Colors.TILE_STROKE })
 
     return graphics
   }
@@ -142,7 +137,7 @@ export class HexGrid extends Container {
     return this.tiles.get(key) ?? null
   }
 
-  public highlightTiles(hexes: HexCoordinates[], color: number = 0x4ade80): void {
+  public highlightTiles(hexes: HexCoordinates[], color: number = Colors.HIGHLIGHT): void {
     this.clearHighlights()
 
     hexes.forEach((hex) => {
