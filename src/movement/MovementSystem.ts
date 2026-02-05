@@ -1,6 +1,6 @@
-import { type HexCoordinates } from '../types/grid.ts'
-import { type Character } from '../types/character.ts'
-import { getHexDistance } from '../utils/hexGridUtils.ts'
+import { type HexCoordinates } from '../grid/types/grid.ts'
+import { type Character } from '../character/types/character.ts'
+import { getHexDistance, hexToKey } from '../utils/hexGridUtils.ts'
 
 export function getMovementRange(
   origin: HexCoordinates,
@@ -28,13 +28,11 @@ export function filterOccupiedTiles(
   const occupiedPositions = new Set<string>()
 
   characters.forEach((character) => {
-    const key: string = `${character.hexPosition.q},${character.hexPosition.r}`
-    occupiedPositions.add(key)
+    occupiedPositions.add(hexToKey(character.hexPosition))
   })
 
   return tiles.filter((tile) => {
-    const key: string = `${tile.q},${tile.r}`
-    return !occupiedPositions.has(key)
+    return !occupiedPositions.has(hexToKey(tile))
   })
 }
 
@@ -58,13 +56,4 @@ export function getValidMovementTiles(
   }
 
   return filterOccupiedTiles(validTiles, characters)
-}
-
-export function hexToKey(hex: HexCoordinates): string {
-  return `${hex.q},${hex.r}`
-}
-
-export function keyToHex(key: string): HexCoordinates {
-  const parts = key.split(',')
-  return { q: parseInt(parts[0], 10), r: parseInt(parts[1], 10) }
 }

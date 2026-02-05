@@ -16,7 +16,7 @@ export class GameScene extends Container implements Scene {
 
   public async onEnter(): Promise<void> {
     if (!this.isInitialized) {
-      this.initializeGame()
+      await this.initializeGame()
       this.isInitialized = true
     }
   }
@@ -51,13 +51,13 @@ export class GameScene extends Container implements Scene {
     }
   }
 
-  private initializeGame(): void {
+  private async initializeGame(): Promise<void> {
     this.hexGrid = new HexGrid()
     this.addChild(this.hexGrid)
 
     this.gameState = new GameState()
 
-    const character = new CharacterEntity({
+    const character = await CharacterEntity.create({
       id: 'cat-1',
       hexPosition: { q: 0, r: 0 },
       name: 'Whiskers',
@@ -69,7 +69,7 @@ export class GameScene extends Container implements Scene {
     this.hexGrid.addChild(character)
     this.gameState.addCharacter(character)
 
-    const enemy = new CharacterEntity({
+    const enemy = await CharacterEntity.create({
       id: 'enemy-1',
       hexPosition: { q: 2, r: 1 },
       name: 'Shadow Beast',

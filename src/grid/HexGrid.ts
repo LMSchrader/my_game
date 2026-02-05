@@ -1,11 +1,11 @@
 import { Container, Graphics, FederatedPointerEvent } from 'pixi.js'
-import { type HexCoordinates, type PixelCoordinates } from '../types/grid.ts'
+import { type HexCoordinates, type PixelCoordinates } from './types/grid.ts'
 import {
   hexToPixel,
   getHexCorners,
   pixelToHex,
+  hexToKey,
 } from '../utils/hexGridUtils.ts'
-import { hexToKey } from '../movement/MovementSystem.ts'
 import { HEX_SIZE, DEFAULT_GRID_CONFIG, Colors } from '../config/config.ts'
 
 export interface HexGridConfig {
@@ -63,8 +63,7 @@ export class HexGrid extends Container {
         maxX = Math.max(maxX, pixel.x)
         minY = Math.min(minY, pixel.y)
         maxY = Math.max(maxY, pixel.y)
-        const key: string = `${hex.q},${hex.r}`
-        tilePositions.set(key, pixel)
+        tilePositions.set(hexToKey(hex), pixel)
       }
     }
 

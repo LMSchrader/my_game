@@ -41,6 +41,12 @@ async function init(): Promise<void> {
   }
 
   window.addEventListener('resize', handleResize)
+
+  const cleanup = (): void => {
+    window.removeEventListener('resize', handleResize)
+  }
+
+  window.addEventListener('beforeunload', cleanup)
 }
 
 init().catch((error: Error) => {

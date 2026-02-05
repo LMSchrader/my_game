@@ -1,5 +1,5 @@
-import { type Character } from '../types/character.ts'
-import { type HexCoordinates } from '../types/grid.ts'
+import { type Character } from '../character/types/character.ts'
+import { type HexCoordinates } from '../grid/types/grid.ts'
 import { getHexDistance } from '../utils/hexGridUtils.ts'
 
 export class GameState {
@@ -63,14 +63,14 @@ export class GameState {
       return false
     }
 
-    character.hexPosition = newHexPosition
+    character.setPosition(newHexPosition)
     character.useMovementPoints(distance)
     return true
   }
 
   public resetAllMovementPoints(): void {
     this.characters.forEach((character) => {
-      character.movementPoints = character.maxMovementPoints
+      character.resetMovementPoints()
     })
   }
 }

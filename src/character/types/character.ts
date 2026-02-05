@@ -1,4 +1,4 @@
-import { type HexCoordinates } from './grid.ts'
+import { type HexCoordinates } from '../../grid/types/grid.ts'
 
 export interface Character {
   id: string
