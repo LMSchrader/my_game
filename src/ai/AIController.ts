@@ -7,8 +7,8 @@ import { type GridBoundsChecker } from './types/ai.ts'
 import { logger } from '../utils/logger.ts'
 
 export class AIController {
-  private gameState: GameState
-  private gridBoundsChecker: GridBoundsChecker
+  private readonly gameState: GameState
+  private readonly gridBoundsChecker: GridBoundsChecker
   private turnManager: TurnManager | null = null
   private turnStartCallback: ((character: unknown) => void) | null = null
 
@@ -19,8 +19,7 @@ export class AIController {
 
   public initialize(turnManager: TurnManager): void {
     this.turnManager = turnManager
-    this.turnStartCallback = (character: unknown) => this.handleTurnStart(character as Character)
-    turnManager.on('turnStart', this.turnStartCallback)
+    this.turnManager.on('turnStart', (character: unknown) => this.handleTurnStart(character as Character))
     logger.debug('AIController initialized with TurnManager')
   }
 
