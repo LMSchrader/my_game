@@ -17,5 +17,5 @@ jobs:
           token: ${{ secrets.RENOVATE_TOKEN }}
     env:
       RENOVATE_REPOSITORIES: 'LMSchrader/my_game'
-      RENOVATE_USERNAME: "renovate-bot"
+      RENOVATE_USERNAME: "my_game[bot]"
       RENOVATE_GIT_AUTHOR: "Renovate Bot <renovate@company.com>"
