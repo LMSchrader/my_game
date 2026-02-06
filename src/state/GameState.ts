@@ -1,57 +1,71 @@
-import { type Character } from '../character/types/character.ts'
-import { type HexCoordinates } from '../grid/types/grid.ts'
+import {type Character} from '../character/types/character.ts'
+import {type HexCoordinates} from '../grid/types/grid.ts'
 
 export class GameState {
-  private characters: Map<string, Character> = new Map()
-  private selectedCharacterId: string | null = null
+    private static instance: GameState
+    private readonly characters: Map<string, Character> = new Map()
+    private selectedCharacterId: string | null = null
 
-  public addCharacter(character: Character): void {
-    this.characters.set(character.id, character)
-  }
-
-  public removeCharacter(characterId: string): void {
-    this.characters.delete(characterId)
-  }
-
-  public getCharacter(characterId: string): Character | undefined {
-    return this.characters.get(characterId)
-  }
-
-  public getAllCharacters(): Character[] {
-    return Array.from(this.characters.values())
-  }
-
-  public getCharacterAtPosition(hexPosition: HexCoordinates): Character | undefined {
-    const characters: Character[] = this.getAllCharacters()
-    return characters.find((character) =>
-      character.hexPosition.q === hexPosition.q && character.hexPosition.r === hexPosition.r
-    )
-  }
-
-  public selectCharacter(characterId: string): void {
-    if (this.characters.has(characterId)) {
-      this.selectedCharacterId = characterId
+    private constructor() {
     }
-  }
 
-  public deselectCharacter(): void {
-    this.selectedCharacterId = null
-  }
-
-  public getSelectedCharacter(): Character | undefined {
-    if (this.selectedCharacterId === null) {
-      return undefined
+    public static getInstance(): GameState {
+        GameState.instance ??= new GameState()
+        return GameState.instance
     }
-    return this.characters.get(this.selectedCharacterId)
-  }
 
-  public isCharacterSelected(): boolean {
-    return this.selectedCharacterId !== null
-  }
+    public addCharacter(character: Character): void {
+        this.characters.set(character.id, character)
+    }
 
-  public resetAllMovementPoints(): void {
-    this.characters.forEach((character) => {
-      character.resetMovementPoints()
-    })
-  }
+    public removeCharacter(characterId: string): void {
+        this.characters.delete(characterId)
+    }
+
+    public getCharacter(characterId: string): Character | undefined {
+        return this.characters.get(characterId)
+    }
+
+    public getAllCharacters(): Character[] {
+        return Array.from(this.characters.values())
+    }
+
+    public getCharacterAtPosition(hexPosition: HexCoordinates): Character | undefined {
+        const characters: Character[] = this.getAllCharacters()
+        return characters.find((character) =>
+            character.hexPosition.q === hexPosition.q && character.hexPosition.r === hexPosition.r
+        )
+    }
+
+    public selectCharacter(characterId: string): void {
+        this.getSelectedCharacter()?.setSelected(false)
+
+        const selectedCharacter = this.characters.get(characterId)
+        if (selectedCharacter) {
+            this.selectedCharacterId = characterId
+            selectedCharacter.setSelected(true)
+        }
+    }
+
+    public deselectCharacter(): void {
+        this.getSelectedCharacter()?.setSelected(false)
+        this.selectedCharacterId = null
+    }
+
+    public getSelectedCharacter(): Character | undefined {
+        if (this.selectedCharacterId === null) {
+            return undefined
+        }
+        return this.getCharacter(this.selectedCharacterId)
+    }
+
+    public isCharacterSelected(): boolean {
+        return this.selectedCharacterId !== null
+    }
+
+    public resetAllMovementPoints(): void {
+        this.characters.forEach((character) => {
+            character.resetMovementPoints()
+        })
+    }
 }

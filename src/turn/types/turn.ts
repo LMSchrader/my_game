@@ -7,4 +7,4 @@ export interface TurnState {
   currentTurnIndex: number
 }
 
-export type TurnEvent = 'turnStart' | 'turnEnd' | 'turnOrderInitialized' | 'movementPointsReset'
+export type TurnEvent = 'turnStart' | 'turnEnd' | 'turnOrderInitialized'
