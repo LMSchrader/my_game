@@ -1,6 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
-  ]
+    "config:best-practices"
+  ],
+  "username": "renovate-bot",
+  "gitAuthor": "Renovate Bot <renovate@company.com>",
+  "branchPrefix": "renovate/",
+  "labels": ["dependencies"],
+  "rangeStrategy": "bump"
 }
