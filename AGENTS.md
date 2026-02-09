@@ -1,83 +1,86 @@
-# Agent Guide for my_game
+# Agent Guidelines for my_game
 
-This guide provides essential information for agentic coding agents working in this repository.
+## Project Overview
+Turn-based tactical game with hex grid and cards, built with TypeScript, Vite, and Pixi.js.
 
-## Build Commands
+## Essential Commands
 
-### Primary Commands
-- `npm run dev` - Start development server
-- `npm run build` - Build for production (runs TypeScript compiler and Vite build)
-- `npm run lint` - Run ESLint to check code quality
-- `npm run preview` - Preview production build
+### Development
+- `npm run dev` - Start Vite development server
+- `npm run build` - Run TypeScript check then build for production
+- `npm run preview` - Preview production build locally
+- `npm run lint` - Run ESLint on all TypeScript files
 
-### TypeScript Check
-- `npx tsc -b` - Run TypeScript compiler check only
+### Quality Gates
+After making changes, always run:
+- `npm run lint` - Fix any linting errors before committing
+- `npm run build` - Ensures TypeScript compilation succeeds (`tsc -b` runs before Vite build)
 
-### Linting
-- `npm run lint` - ESLint check (recommended to run after changes)
-- Note: Project does not currently have tests configured
+**Note**: No test framework is currently configured.
 
 ## Code Style Guidelines
 
+### File Organization
+- Place types in `types/` subdirectories within each module (e.g., `character/types/character.ts`)
+- Organize by feature: `ai/`, `character/`, `grid/`, `scenes/`, `state/`, `turn/`, `utils/`, `interaction/`, `movement/`
+
 ### Imports
-- Always use `.ts` extension for local imports: `import { logger } from './utils/logger.ts'`
-- No extension for external library imports: `import { Application } from 'pixi.js'`
-- Use `import { type ... }` for type-only imports: `import { type HexCoordinates } from '../types/grid.ts'`
-- Group imports: external packages first, then local imports
-
-### Formatting
-- No Prettier configured - follow TypeScript/ESLint conventions
-- Use double quotes for strings
-- Use semicolons at end of statements
-- Indent with 2 spaces
-- Trailing commas allowed in multi-line arrays/objects
-
-### Types
-- Explicit parameter types required: `(hex: HexCoordinates) => void`
-- Explicit return types required on all functions: `: void`, `: PixelCoordinates`
-- Use interface for object shapes: `export interface HexCoordinates`
-- Use type alias for union types or complex types
-- `const` variables should include type annotations for clarity
+- Use type imports with `type` keyword: `import {type HexCoordinates} from '...'`
+- Export types from parent index files: `export {Team} from './types/character.ts'`
+- Import relative paths with `.ts` extension
+- Group imports: third-party → local types → local implementations;
 
 ### Naming Conventions
-- Classes: PascalCase (HexGrid, Graphics, Container)
-- Functions/Methods: camelCase (hexToPixel, handleClick, center)
-- Variables/Parameters: camelCase (q, r, hex, pixel)
-- Constants: UPPER_SNAKE_CASE (HEX_SIZE, SQRT3, DEFAULT_CONFIG)
-- Private class members: use `private` modifier with camelCase
-- Type names: PascalCase (HexCoordinates, PixelCoordinates)
+- Classes: PascalCase (`CharacterEntity`, `HexGrid`, `GameState`)
+- Interfaces and types: PascalCase (`HexCoordinates`, `PositionProvider`, `Character`)
+- Methods and public properties: camelCase (`getCharacter`, `hexPosition`)
+- Private properties with getters: underscore prefix (`_isSelected`, `_isActiveTurn`)
+- Constants: UPPER_SNAKE_CASE (`HEX_SIZE`, `DEFAULT_MOVEMENT_POINTS`, `Colors`)
+- Enums/const enums: Create `Values` const object then export type and alias (see Team pattern)
 
-### Class Structure
-- Use explicit access modifiers: `public`, `private`, `protected`
-- Constructor at top after private fields
-- Public methods before private methods
-- Order: private fields, constructor, public methods, private methods
+### Classes and Types
+- Always add `readonly` to class properties that shouldn't change: `public readonly id: string`
+- Use type annotations on all method parameters and return types
+- Mark private methods explicitly with `private`
+- Use optional chaining `?.` for callback invocation
+- For singletons: private constructor with `instance ??= new()` pattern (see TurnManager)
+- Use non-null assertion `!` for properties you know are initialized but TypeScript can't verify (e.g., Graphics objects created in constructor)
+- Prefer static async factory methods for classes requiring async initialization (e.g., `CharacterEntity.create`)
+
+### Configuration Patterns
+- Use `as const` for configuration objects to enable type inference: `Colors = {...} as const`
+- Place constants in `src/config/config.ts`
+- Use `??` or fallback values for defaults: `config.hexPosition ?? {q: 0, r: 0}`
 
 ### Error Handling
-- Use try/catch for async operations with proper Error typing
-- Use optional chaining (`?.`) for null-safe method calls
-- Import logger from `./utils/logger.ts` for logging errors
-- Use `logger.error()`, `logger.debug()`, etc. for different log levels
+- Log errors with the centralized logger: `logger.error('message:', error)`
+- Use other log levels (warn, info, debug) were suitable
+- Import logger from `src/utils/logger.ts`
+- Use try-catch around async operations (e.g., sprite loading)
 
-### File Organization
-- src/types/ - TypeScript interfaces and types
-- src/utils/ - Utility functions and helpers
-- src/grid/ - Grid-related classes and components
-- src/main.ts - Application entry point
+### Pixi.js Specific
+- Documentation can be found at [documentation/llms.txt](documentation/llms.txt)
+- Extend Pixi classes when appropriate (Container, Graphics, Sprite)
+- Set `eventMode: 'static'` for interactive containers
+- Use `addChild()`/`removeChild()` for adding sprites/graphics
+- Clean up with `.destroy()` on graphics objects
+- For buttons use [FancyButton](https://pixijs.io/ui/FancyButton.html)
+- Use Pixi EventEmitter for custom events, not Node.js EventEmitter
 
-### TypeScript Config (tsconfig.app.json)
-- Strict mode enabled - no implicit any
-- Unused locals/parameters must be removed
-- ES2022 target with ESNext modules
-- Bundler module resolution
+### Type Safety
+- Use `Map<string, T>` over objects for keyed collections
+- Prefer explicit type imports over importing entire namespaces
+- Use labeled tuple types when appropriate: `[number, number]`
+- Use object key patterns with helper functions: `hexToKey({q, r}) -> '${q},${r}'`
 
-### ESLint Rules
-- Follow @eslint/js and typescript-eslint recommended configs
-- Target ES2022, browser globals enabled
-- Ignore: dist directory
+### Helper Functions
+- Create utility functions in `utils/` for repeated logic (e.g., `hexToPixel`, `pixelToHex`, `getHexDistance`)
+- Keep utility functions pure where possible
+- Export utility functions from module index files
 
-### Code Patterns
-- Use nullish coalescing for fallback values: `import.meta.env.VITE_LOG_LEVEL ?? 'info'`
-- Use array methods with callbacks for transformations
-- Private helper methods should be grouped logically
-- Constants defined at file level or class level before usage
+### Formatting
+- Indentation: 4 spaces
+- Semi-colons: required (no trailing comma in last property)
+- Max line length: unspecified but keep reasonable
+
+## Pixi.js and logging are already configured; import from existing modules rather than adding new dependencies.

@@ -1,7 +1,6 @@
 # Turn based tactic game with hex grid and cards
 
 ## Open todos
-- Movement distance does not take obstacles into account
 - Implement cards
 
 ## Working with Opencode

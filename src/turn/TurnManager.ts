@@ -90,7 +90,6 @@ export class TurnManager {
     }
 
     private calculateTurnOrder(characters: Character[]): TurnQueue {
-        const sortedCharacters = [...characters].sort((a, b) => b.speed - a.speed)
-        return sortedCharacters
+        return [...characters].sort((a, b) => b.speed - a.speed)
     }
 }

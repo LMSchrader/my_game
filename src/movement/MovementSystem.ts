@@ -1,39 +1,39 @@
 import {type HexCoordinates} from '../grid/types/grid.ts'
 import {type Character} from '../character/types/character.ts'
-import {getHexDistance, hexToKey} from '../utils/hexGridUtils.ts'
+import {getNeighbors, hexToKey} from '../utils/hexGridUtils.ts'
 
-export function getMovementRange(
+export function getMovementRangeWithObstacles(
     origin: HexCoordinates,
-    movementPoints: number
+    movementPoints: number,
+    blockedTiles: Set<string>
 ): HexCoordinates[] {
-    const tiles: HexCoordinates[] = []
-    const range: number = movementPoints
+    const reachableTiles: HexCoordinates[] = []
+    const visited: Set<string> = new Set()
+    const queue: { hex: HexCoordinates; cost: number }[] = [{hex: origin, cost: 0}]
 
-    for (let q = -range; q <= range; q++) {
-        for (let r = Math.max(-range, -q - range); r <= Math.min(range, -q + range); r++) {
-            const hex: HexCoordinates = {q: origin.q + q, r: origin.r + r}
-            if (getHexDistance(origin, hex) <= movementPoints) {
-                tiles.push(hex)
+    visited.add(hexToKey(origin))
+
+    while (queue.length > 0) {
+        const current = queue.shift()!
+        if (current.cost > 0) {
+            reachableTiles.push(current.hex)
+        }
+
+        if (current.cost < movementPoints) {
+            const neighbors: HexCoordinates[] = getNeighbors(current.hex)
+
+            for (const neighbor of neighbors) {
+                const neighborKey: string = hexToKey(neighbor)
+
+                if (!visited.has(neighborKey) && !blockedTiles.has(neighborKey)) {
+                    visited.add(neighborKey)
+                    queue.push({hex: neighbor, cost: current.cost + 1})
+                }
             }
         }
     }
 
-    return tiles
-}
-
-export function filterOccupiedTiles(
-    tiles: HexCoordinates[],
-    characters: Character[]
-): HexCoordinates[] {
-    const occupiedPositions = new Set<string>()
-
-    characters.forEach((character) => {
-        occupiedPositions.add(hexToKey(character.hexPosition))
-    })
-
-    return tiles.filter((tile) => {
-        return !occupiedPositions.has(hexToKey(tile))
-    })
+    return reachableTiles
 }
 
 export function filterGridBounds(
@@ -49,11 +49,19 @@ export function getValidMovementTiles(
     characters: Character[],
     isInGrid?: (hex: HexCoordinates) => boolean
 ): HexCoordinates[] {
-    let validTiles: HexCoordinates[] = getMovementRange(origin, movementPoints)
+    const occupiedPositions = new Set<string>()
+
+    characters.forEach((character) => {
+        occupiedPositions.add(hexToKey(character.hexPosition))
+    })
+
+    occupiedPositions.delete(hexToKey(origin))
+
+    let validTiles: HexCoordinates[] = getMovementRangeWithObstacles(origin, movementPoints, occupiedPositions)
 
     if (isInGrid) {
         validTiles = filterGridBounds(validTiles, isInGrid)
     }
 
-    return filterOccupiedTiles(validTiles, characters)
+    return validTiles
 }
