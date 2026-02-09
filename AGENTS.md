@@ -72,6 +72,7 @@ After making changes, always run:
 - Prefer explicit type imports over importing entire namespaces
 - Use labeled tuple types when appropriate: `[number, number]`
 - Use object key patterns with helper functions: `hexToKey({q, r}) -> '${q},${r}'`
+- Use `undefined` as the default/not initialized value
 
 ### Helper Functions
 - Create utility functions in `utils/` for repeated logic (e.g., `hexToPixel`, `pixelToHex`, `getHexDistance`)

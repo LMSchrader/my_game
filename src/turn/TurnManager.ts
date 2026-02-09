@@ -25,9 +25,9 @@ export class TurnManager {
         this.emit('turnOrderInitialized')
     }
 
-    public getActiveCharacter(): Character | null {
+    public getActiveCharacter(): Character | undefined {
         if (this.turnQueue.length === 0) {
-            return null
+            return undefined
         }
         return this.turnQueue[this.currentTurnIndex]
     }
