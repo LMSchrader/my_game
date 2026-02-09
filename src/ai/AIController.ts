@@ -1,16 +1,16 @@
-import { type Character, Team } from '../character/types/character.ts'
-import { getValidMovementTiles } from '../movement/MovementSystem.ts'
-import { getHexDistance } from '../utils/hexGridUtils.ts'
-import { TurnManager } from '../turn/TurnManager.ts'
-import { GameState } from '../state/GameState.ts'
-import { type GridBoundsChecker } from './types/ai.ts'
-import { logger } from '../utils/logger.ts'
+import {type Character, Team} from '../character/types/character.ts'
+import {getValidMovementTiles} from '../movement/MovementSystem.ts'
+import {getHexDistance} from '../utils/hexGridUtils.ts'
+import {TurnManager} from '../turn/TurnManager.ts'
+import {GameState} from '../state/GameState.ts'
+import {type GridBoundsChecker} from './types/ai.ts'
+import {logger} from '../utils/logger.ts'
 
 export class AIController {
   private readonly gameState: GameState
   private readonly gridBoundsChecker: GridBoundsChecker
-  private turnManager: TurnManager | null = null
-  private turnStartCallback: ((character: unknown) => void) | null = null
+  private turnManager: TurnManager | undefined
+  private turnStartCallback: ((character: unknown) => void) | undefined
 
   constructor(gameState: GameState, gridBoundsChecker: GridBoundsChecker) {
     this.gameState = gameState
@@ -19,7 +19,8 @@ export class AIController {
 
   public initialize(turnManager: TurnManager): void {
     this.turnManager = turnManager
-    this.turnManager.on('turnStart', (character: unknown) => this.handleTurnStart(character as Character))
+    this.turnStartCallback = (character: unknown) => this.handleTurnStart(character as Character)
+    this.turnManager.on('turnStart', this.turnStartCallback)
     logger.debug('AIController initialized with TurnManager')
   }
 
@@ -60,14 +61,5 @@ export class AIController {
 
   private delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms))
-  }
-
-  public shutdown(): void {
-    if (this.turnManager && this.turnStartCallback) {
-      this.turnManager.off('turnStart', this.turnStartCallback)
-      logger.debug('AIController removed turn manager listener')
-    }
-    this.turnManager = null
-    this.turnStartCallback = null
   }
 }

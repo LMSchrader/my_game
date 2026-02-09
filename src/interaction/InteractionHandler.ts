@@ -7,7 +7,7 @@ import {logger} from '../utils/logger.ts'
 import type {HexGrid} from "../grid/HexGrid.ts";
 
 interface TurnProvider {
-    getActiveCharacter(): Character | null
+    getActiveCharacter(): Character | undefined
 
     isPlayerTurn(): boolean
 }

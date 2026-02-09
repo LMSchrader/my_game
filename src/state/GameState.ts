@@ -4,7 +4,7 @@ import {type HexCoordinates} from '../grid/types/grid.ts'
 export class GameState {
     private static instance: GameState
     private readonly characters: Map<string, Character> = new Map()
-    private selectedCharacterId: string | null = null
+    private selectedCharacterId: string | undefined
 
     private constructor() {
     }
@@ -49,18 +49,18 @@ export class GameState {
 
     public deselectCharacter(): void {
         this.getSelectedCharacter()?.setSelected(false)
-        this.selectedCharacterId = null
+        this.selectedCharacterId = undefined
     }
 
     public getSelectedCharacter(): Character | undefined {
-        if (this.selectedCharacterId === null) {
+        if (this.selectedCharacterId === undefined) {
             return undefined
         }
         return this.getCharacter(this.selectedCharacterId)
     }
 
     public isCharacterSelected(): boolean {
-        return this.selectedCharacterId !== null
+        return this.selectedCharacterId !== undefined
     }
 
     public resetAllMovementPoints(): void {

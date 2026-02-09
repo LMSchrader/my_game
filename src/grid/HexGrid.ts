@@ -11,7 +11,7 @@ export interface HexGridConfig {
 export class HexGrid extends Container {
     private readonly tiles: Map<string, Graphics> = new Map()
     private readonly highlights: Map<string, Graphics> = new Map()
-    private onClick: ((hex: HexCoordinates) => void) | null = null
+    private onClick: ((hex: HexCoordinates) => void) | undefined
     private readonly config: HexGridConfig
     private centerX: number = 0
     private centerY: number = 0
@@ -121,9 +121,9 @@ export class HexGrid extends Container {
         return graphics
     }
 
-    public getTile(hex: HexCoordinates): Graphics | null {
+    public getTile(hex: HexCoordinates): Graphics | undefined {
         const key: string = hexToKey(hex)
-        return this.tiles.get(key) ?? null
+        return this.tiles.get(key) ?? undefined
     }
 
     public highlightTiles(hexes: HexCoordinates[], color: number = Colors.TILE_HIGHLIGHT): void {
