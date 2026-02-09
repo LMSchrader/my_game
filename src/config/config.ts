@@ -16,7 +16,7 @@ export const DEFAULT_GRID_CONFIG: HexGridConfig = {
   cols: 8,
 }
 
-export const DEFAULT_MOVEMENT_POINTS: number = 5
+export const DEFAULT_MOVEMENT_POINTS: number = 2
 export const DEFAULT_SPRITE_SCALE: number = 0.5
 export const DEFAULT_SPEED: number = 5
 
