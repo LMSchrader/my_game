@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from "pixi.js";
-import { type Character, Team } from "../character/types/character.ts";
+import { type Character, Team } from "../game/types/character.ts";
 import { Colors, FONTSIZE_SMALL, TEXT_COLOR_WHITE } from "../config/config.ts";
 
 export class TurnOrderDisplay extends Container {
@@ -54,7 +54,7 @@ export class TurnOrderDisplay extends Container {
     const card = new Graphics();
 
     const teamColor =
-      character.team === Team.TeamA ? Colors.CHARACTER_DEFAULT : Colors.ENEMY;
+      character.team === Team.TeamA ? Colors.PLAYER : Colors.ENEMY;
 
     card.roundRect(0, 0, this.cardWidth, this.cardHeight, 8);
     card.fill(teamColor);
@@ -95,9 +95,7 @@ export class TurnOrderDisplay extends Container {
         if (character) {
           card.clear();
           const teamColor =
-            character.team === Team.TeamA
-              ? Colors.CHARACTER_DEFAULT
-              : Colors.ENEMY;
+            character.team === Team.TeamA ? Colors.PLAYER : Colors.ENEMY;
           card.roundRect(0, 0, this.cardWidth, this.cardHeight, 8);
           card.fill(teamColor);
           card.stroke({ width: 2, color: TEXT_COLOR_WHITE });

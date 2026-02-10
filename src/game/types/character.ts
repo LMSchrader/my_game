@@ -1,4 +1,4 @@
-import { type HexCoordinates } from "../../grid/types/grid.ts";
+import { type HexCoordinates } from "./grid.ts";
 
 export const TeamValues = {
   TeamA: "TeamA",
@@ -18,7 +18,7 @@ export interface Character {
   team: Team;
   speed: number;
   setPosition(hexPosition: HexCoordinates): void;
-  useMovementPoints(points: number): void;
+  move(hexPosition: HexCoordinates): void;
   resetMovementPoints(): void;
   hasEnoughMovementPoints(points: number): boolean;
   setSelected(isSelected: boolean): void;

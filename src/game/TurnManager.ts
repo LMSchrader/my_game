@@ -1,27 +1,26 @@
 import { EventEmitter } from "pixi.js";
-import { type Character, Team } from "../character/types/character.ts";
+import { type Character, Team } from "./types/character.ts";
 import { type TurnEvent, type TurnQueue } from "./types/turn.ts";
 import { logger } from "../utils/logger.ts";
+import type { Game } from "./Game.ts";
 
 export class TurnManager {
-  private static instance: TurnManager | undefined;
-  private turnQueue: TurnQueue = [];
+  private readonly game: Game;
   private currentTurnIndex: number = 0;
   private readonly emitter: EventEmitter = new EventEmitter();
+  private turnOrder: string[] = [];
 
-  private constructor() {}
-
-  public static getInstance(): TurnManager {
-    TurnManager.instance ??= new TurnManager();
-    return TurnManager.instance;
+  public constructor(game: Game) {
+    this.game = game;
   }
 
   public initializeTurnOrder(characters: Character[]): void {
-    this.turnQueue = this.calculateTurnOrder(characters);
+    const turnQueue = this.calculateTurnOrder(characters);
+    this.turnOrder = turnQueue.map((c) => c.id);
     this.currentTurnIndex = 0;
     logger.debug(
       {
-        turnOrder: this.turnQueue.map(
+        turnOrder: turnQueue.map(
           (c) => `${c.name} (${c.team}) (SPD: ${c.speed})`,
         ),
       },
@@ -32,14 +31,15 @@ export class TurnManager {
   }
 
   public getActiveCharacter(): Character | undefined {
-    if (this.turnQueue.length === 0) {
+    if (this.turnOrder.length === 0) {
       return undefined;
     }
-    return this.turnQueue[this.currentTurnIndex];
+    const characterId = this.turnOrder[this.currentTurnIndex];
+    return this.game.getAllCharacters().find((c) => c.id === characterId);
   }
 
   public endTurn(): void {
-    if (this.turnQueue.length === 0) {
+    if (this.turnOrder.length === 0) {
       logger.warn("Cannot end turn: no characters in turn queue");
       return;
     }
@@ -55,7 +55,7 @@ export class TurnManager {
       logger.debug(`Ended turn for ${currentCharacter.name}`);
     }
 
-    this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnQueue.length;
+    this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
 
     const newActiveCharacter = this.getActiveCharacter();
     if (newActiveCharacter) {
@@ -71,11 +71,10 @@ export class TurnManager {
   }
 
   public getTurnQueue(): TurnQueue {
-    return [...this.turnQueue];
-  }
-
-  public getCurrentTurnIndex(): number {
-    return this.currentTurnIndex;
+    const allCharacters = this.game.getAllCharacters();
+    return this.turnOrder
+      .map((id) => allCharacters.find((c) => c.id === id))
+      .filter((c): c is Character => c !== undefined);
   }
 
   public on(event: TurnEvent, callback: (...args: unknown[]) => void): void {
@@ -88,16 +87,15 @@ export class TurnManager {
 
   public reset(): void {
     this.emitter.removeAllListeners();
-    this.turnQueue = [];
+    this.turnOrder = [];
     this.currentTurnIndex = 0;
-    TurnManager.instance = undefined;
-  }
-
-  private emit(event: TurnEvent, ...args: unknown[]): void {
-    this.emitter.emit(event, ...args);
   }
 
   private calculateTurnOrder(characters: Character[]): TurnQueue {
     return [...characters].sort((a, b) => b.speed - a.speed);
+  }
+
+  private emit(event: TurnEvent, ...args: unknown[]): void {
+    this.emitter.emit(event, ...args);
   }
 }

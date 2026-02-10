@@ -1,16 +1,18 @@
-import { type Character } from "../character/types/character.ts";
-import { type HexCoordinates } from "../grid/types/grid.ts";
+import { type Character, Team } from "./types/character.ts";
+import { type HexCoordinates } from "./types/grid.ts";
+import { TurnManager } from "./TurnManager.ts";
 
-export class GameState {
-  private static instance: GameState;
+export class Game {
+  public readonly turnManager: TurnManager;
   private readonly characters: Map<string, Character> = new Map();
-  private selectedCharacterId: string | undefined;
+  private selectedCharacterId?: string;
 
-  private constructor() {}
+  public constructor() {
+    this.turnManager = new TurnManager(this);
+  }
 
-  public static getInstance(): GameState {
-    GameState.instance ??= new GameState();
-    return GameState.instance;
+  public start(): void {
+    this.turnManager.initializeTurnOrder(this.getAllCharacters());
   }
 
   public addCharacter(character: Character): void {
@@ -19,10 +21,6 @@ export class GameState {
 
   public removeCharacter(characterId: string): void {
     this.characters.delete(characterId);
-  }
-
-  public getCharacter(characterId: string): Character | undefined {
-    return this.characters.get(characterId);
   }
 
   public getAllCharacters(): Character[] {
@@ -59,16 +57,19 @@ export class GameState {
     if (this.selectedCharacterId === undefined) {
       return undefined;
     }
-    return this.getCharacter(this.selectedCharacterId);
+    return this.characters.get(this.selectedCharacterId);
   }
 
-  public isCharacterSelected(): boolean {
-    return this.selectedCharacterId !== undefined;
+  public isCharacterPlayable(character: Character): boolean {
+    return this.isActiveCharacter(character) && this.isPlayerTeam(character);
   }
 
-  public resetAllMovementPoints(): void {
-    this.characters.forEach((character) => {
-      character.resetMovementPoints();
-    });
+  private isActiveCharacter(character: Character): boolean {
+    const activeCharacter = this.turnManager.getActiveCharacter();
+    return activeCharacter?.id === character.id;
+  }
+
+  private isPlayerTeam(character: Character): boolean {
+    return character.team === Team.TeamA;
   }
 }
