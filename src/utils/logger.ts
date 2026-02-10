@@ -1,7 +1,7 @@
-import log from "loglevel";
+import pino from "pino";
 
-const LOG_LEVEL =
-  import.meta.env.VITE_LOG_LEVEL ?? (import.meta.env.PROD ? "info" : "trace");
+const LOG_LEVEL = import.meta.env.VITE_LOG_LEVEL ?? "info";
 
-export const logger = log.getLogger("my_game");
-logger.setLevel(LOG_LEVEL);
+export const logger = pino({
+  level: LOG_LEVEL,
+});

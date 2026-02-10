@@ -93,7 +93,7 @@ export class CharacterEntity extends Container implements Character {
       this.sprite.scale.set(this.spriteScale);
       this.addChild(this.sprite);
     } catch (error) {
-      logger.error(`Failed to load sprite for character ${this.id}:`, error);
+      logger.error(error, `Failed to load sprite for character ${this.id}`);
     }
   }
 

@@ -32,5 +32,5 @@ async function init(): Promise<void> {
 try {
   await init();
 } catch (error) {
-  logger.error("Failed to initialize application:", error);
+  logger.error(error, "Failed to initialize application");
 }

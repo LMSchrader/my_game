@@ -20,8 +20,12 @@ export class TurnManager {
     this.turnQueue = this.calculateTurnOrder(characters);
     this.currentTurnIndex = 0;
     logger.debug(
-      "Turn order initialized:",
-      this.turnQueue.map((c) => `${c.name} (${c.team}) (SPD: ${c.speed})`),
+      {
+        turnOrder: this.turnQueue.map(
+          (c) => `${c.name} (${c.team}) (SPD: ${c.speed})`,
+        ),
+      },
+      "Turn order initialized",
     );
     this.getActiveCharacter()?.setActiveTurn(true);
     this.emit("turnOrderInitialized");
