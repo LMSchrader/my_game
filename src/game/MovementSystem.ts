@@ -1,6 +1,10 @@
-import { type HexCoordinates } from "../grid/types/grid.ts";
-import { type Character } from "../character/types/character.ts";
-import { getNeighbors, hexToKey } from "../utils/hexGridUtils.ts";
+import { type HexCoordinates } from "./types/grid.ts";
+import { type Character } from "./types/character.ts";
+import {
+  getNeighbors,
+  getHexDistance,
+  hexToKey,
+} from "../utils/hexGridUtils.ts";
 
 export function getMovementRangeWithObstacles(
   origin: HexCoordinates,
@@ -70,4 +74,28 @@ export function getValidMovementTiles(
   }
 
   return validTiles;
+}
+
+export function isValidMove(
+  origin: HexCoordinates,
+  target: HexCoordinates,
+  movementPoints: number,
+  characters: Character[],
+): boolean {
+  const distance = getHexDistance(origin, target);
+  if (distance > movementPoints) {
+    return false;
+  }
+
+  const targetKey = hexToKey(target);
+  const originKey = hexToKey(origin);
+
+  for (const character of characters) {
+    const charKey = hexToKey(character.hexPosition);
+    if (charKey === targetKey && charKey !== originKey) {
+      return false;
+    }
+  }
+
+  return true;
 }

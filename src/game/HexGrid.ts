@@ -16,7 +16,7 @@ export interface HexGridConfig {
 export class HexGrid extends Container {
   private readonly tiles: Map<string, Graphics> = new Map();
   private readonly highlights: Map<string, Graphics> = new Map();
-  private onClick: ((hex: HexCoordinates) => void) | undefined;
+  private onClick?: (hex: HexCoordinates) => void;
   private readonly config: HexGridConfig;
   private centerX: number = 0;
   private centerY: number = 0;

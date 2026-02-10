@@ -1,16 +1,14 @@
 import { Application } from "pixi.js";
 import { sceneManager } from "./scenes/SceneManager.ts";
-import { SceneType } from "./scenes/types/scene.ts";
 import { logger } from "./utils/logger.ts";
+import { initAssets } from "./utils/assets.ts";
 import "./index.css";
+import { StartScreen } from "./scenes/StartScreen.ts";
 
 export const app = new Application();
 
 function resize() {
-  const currentScene = sceneManager.getCurrentScene();
-  if (currentScene) {
-    currentScene.onResize(window.innerWidth, window.innerHeight);
-  }
+  sceneManager.resize(window.innerWidth, window.innerHeight);
 }
 
 async function init(): Promise<void> {
@@ -22,7 +20,9 @@ async function init(): Promise<void> {
 
   window.addEventListener("resize", resize);
 
-  await sceneManager.switchScene(SceneType.START);
+  await initAssets();
+
+  await sceneManager.switchScene(StartScreen);
 }
 
 try {

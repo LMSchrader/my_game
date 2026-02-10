@@ -1,31 +1,48 @@
-import { Assets, Container, Graphics, Sprite, Text } from "pixi.js";
-import { type Scene, SceneType } from "./types/scene.ts";
-import { logger } from "../utils/logger.ts";
+import { Container, Sprite, Text } from "pixi.js";
+import { type Scene } from "./types/scene.ts";
 import {
   FONTSIZE_BIG,
-  FONTSIZE_MEDIUM,
-  GAME_TITLE,
-  PLAY,
+  i18n,
+  SpritePaths,
   TEXT_COLOR_WHITE,
 } from "../config/config.ts";
 import { FancyButton } from "@pixi/ui";
 import { center, scaleToFullSize } from "../utils/uiUtils.ts";
 import { sceneManager } from "./SceneManager.ts";
-
-const BACKGROUND_PATH: string = "/background.png";
+import { GenericButton } from "../ui/GenericButton.ts";
+import { GameScene } from "./GameScene.ts";
 
 export class StartScreen extends Container implements Scene {
-  public readonly type: SceneType = SceneType.START;
+  public static readonly assetBundles = ["common"];
 
-  private background: Sprite | undefined;
-  private titleText: Text | undefined;
-  private playButton: FancyButton | undefined;
+  private readonly background: Sprite;
+  private readonly titleText: Text;
+  private readonly playButton: FancyButton;
 
-  public async onEnter(): Promise<void> {
-    await this.loadBackground();
-    this.createTitle();
-    this.createPlayButton();
+  constructor() {
+    super();
+    this.background = Sprite.from(SpritePaths.BACKGROUND);
+    this.addChild(this.background);
+
+    this.titleText = new Text({
+      text: i18n.GAME_TITLE,
+      style: {
+        fontSize: FONTSIZE_BIG,
+        fill: TEXT_COLOR_WHITE,
+        fontWeight: "bold",
+        align: "center",
+      },
+    });
+
+    this.addChild(this.titleText);
+
+    this.playButton = new GenericButton({ text: i18n.PLAY });
+
+    this.playButton.onPress.connect(() => sceneManager.switchScene(GameScene));
+    this.addChild(this.playButton);
   }
+
+  public async onEnter(): Promise<void> {}
 
   public async onExit(): Promise<void> {
     this.destroy({
@@ -36,66 +53,14 @@ export class StartScreen extends Container implements Scene {
 
   public onResize(width: number, height: number): void {
     center(this, width, height);
-    scaleToFullSize(this.background!, width, height);
-  }
 
-  private async loadBackground(): Promise<void> {
-    try {
-      const texture = await Assets.load(BACKGROUND_PATH);
-      this.background = new Sprite(texture);
-      this.background.anchor.set(0.5);
-      this.background.x = 0;
-      this.background.y = 0;
-      this.addChild(this.background);
-    } catch (error) {
-      logger.error(error, "Failed to load Start screen background");
-    }
-  }
+    this.background.x = 0;
+    this.background.y = 0;
+    this.background.anchor.set(0.5);
+    scaleToFullSize(this.background, width, height);
 
-  private createTitle(): void {
-    this.titleText = new Text({
-      text: GAME_TITLE,
-      style: {
-        fontSize: FONTSIZE_BIG,
-        fill: TEXT_COLOR_WHITE,
-        fontWeight: "bold",
-        align: "center",
-      },
-    });
     this.titleText.y = -150;
     this.titleText.anchor.set(0.5);
     this.titleText.resolution = window.devicePixelRatio || 1;
-    this.addChild(this.titleText);
-  }
-
-  private createPlayButton(): void {
-    const defaultView: Graphics = new Graphics()
-      .roundRect(0, 0, 200, 60, 10)
-      .fill(0x3b82f6);
-    const hoverView: Graphics = new Graphics()
-      .roundRect(0, 0, 200, 60, 10)
-      .fill(0x60a5fa);
-
-    const buttonText: Text = new Text({
-      text: PLAY,
-      style: {
-        fontSize: FONTSIZE_MEDIUM,
-        fill: TEXT_COLOR_WHITE,
-        fontWeight: "bold",
-        align: "center",
-      },
-    });
-
-    this.playButton = new FancyButton({
-      text: buttonText,
-      defaultView,
-      hoverView,
-      anchor: 0.5,
-    });
-
-    this.playButton.onPress.connect(() =>
-      sceneManager.switchScene(SceneType.GAME),
-    );
-    this.addChild(this.playButton);
   }
 }

@@ -1,7 +1,7 @@
 import {
   type HexCoordinates,
   type PixelCoordinates,
-} from "../grid/types/grid.ts";
+} from "../game/types/grid.ts";
 import { HEX_SIZE } from "../config/config.ts";
 import { Graphics } from "pixi.js";
 

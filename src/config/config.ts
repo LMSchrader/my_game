@@ -1,8 +1,10 @@
-import { type HexGridConfig } from "../grid/HexGrid.ts";
+import { type HexGridConfig } from "../game/HexGrid.ts";
 
-export const GAME_TITLE: string = "My Game";
-export const PLAY: string = "Play";
-export const END_TURN: string = "End Turn";
+export const i18n = {
+  GAME_TITLE: "My Game",
+  PLAY: "Play",
+  END_TURN: "End Turn",
+};
 
 export const FONTSIZE_BIG: number = 64;
 export const FONTSIZE_MEDIUM: number = 32;
@@ -21,7 +23,7 @@ export const DEFAULT_SPRITE_SCALE: number = 0.5;
 export const DEFAULT_SPEED: number = 5;
 
 export const Colors = {
-  CHARACTER_DEFAULT: 0x3b82f6,
+  PLAYER: 0x3b82f6,
   ENEMY: 0xef4444,
   ACTIVE_CHARACTER: 0xffffff,
   SELECTED_CHARACTER: 0xffd700,
@@ -31,6 +33,7 @@ export const Colors = {
 } as const;
 
 export const SpritePaths = {
-  CHARACTER: "/character.png",
-  ENEMY: "/enemy.png",
+  CHARACTER: "character.png",
+  ENEMY: "enemy.png",
+  BACKGROUND: "background.png",
 } as const;

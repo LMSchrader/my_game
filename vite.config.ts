@@ -1,6 +1,55 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin, type ResolvedConfig } from 'vite';
+import { AssetPack, type AssetPackConfig  } from '@assetpack/core';
+import {pixiPipes} from "@assetpack/core/pixi";
 
-// https://vite.dev/config/
+function assetpackPlugin(): Plugin {
+  const apConfig: AssetPackConfig = {
+    entry: './raw-assets',
+    pipes: [
+      ...pixiPipes({
+        texturePacker: {
+          texturePacker: {
+            removeFileExtension: true,
+          },
+        },
+        manifest: {
+          output: './public/assets/assets-manifest.json',
+        }
+      }),
+    ],
+  };
+  let mode: ResolvedConfig['command'];
+  let ap: AssetPack | undefined;
+
+  return {
+    name: 'vite-plugin-assetpack',
+    configResolved(resolvedConfig) {
+      mode = resolvedConfig.command;
+      if (!resolvedConfig.publicDir) return;
+      if (apConfig.output) return;
+      const publicDir = resolvedConfig.publicDir.replace(process.cwd(), '');
+      apConfig.output = `.${publicDir}/assets/`;
+    },
+    buildStart: async () => {
+      if (mode === 'serve') {
+        if (ap) return;
+        ap = new AssetPack(apConfig);
+        void ap.watch();
+      } else {
+        await new AssetPack(apConfig).run();
+      }
+    },
+    buildEnd: async () => {
+      if (ap) {
+        await ap.stop();
+        ap = undefined;
+      }
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [],
+  plugins: [
+    assetpackPlugin(),
+  ],
 })
