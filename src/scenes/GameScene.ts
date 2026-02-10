@@ -71,7 +71,7 @@ export class GameScene extends Container implements Scene {
       this.background.eventMode = "static";
       this.addChild(this.background);
     } catch (error) {
-      logger.error("Failed to load Game background:", error);
+      logger.error(error, "Failed to load Game background");
     }
   }
 

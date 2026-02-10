@@ -13,12 +13,11 @@
   },
   "dependencies": {
     "@pixi/ui": "^2.3.2",
-    "loglevel": "^1.9.2",
+    "pino": "^10.3.1",
     "pixi.js": "^8.16.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@types/loglevel": "^1.6.3",
     "@types/node": "^24.10.12",
     "eslint": "^9.39.2",
     "globals": "^17.3.0",

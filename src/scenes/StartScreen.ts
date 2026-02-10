@@ -54,7 +54,7 @@ export class StartScreen extends Container implements Scene {
       this.background.y = 0;
       this.addChild(this.background);
     } catch (error) {
-      logger.error("Failed to load Start screen background:", error);
+      logger.error(error, "Failed to load Start screen background");
     }
   }
 
