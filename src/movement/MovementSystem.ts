@@ -1,67 +1,73 @@
-import {type HexCoordinates} from '../grid/types/grid.ts'
-import {type Character} from '../character/types/character.ts'
-import {getNeighbors, hexToKey} from '../utils/hexGridUtils.ts'
+import { type HexCoordinates } from "../grid/types/grid.ts";
+import { type Character } from "../character/types/character.ts";
+import { getNeighbors, hexToKey } from "../utils/hexGridUtils.ts";
 
 export function getMovementRangeWithObstacles(
-    origin: HexCoordinates,
-    movementPoints: number,
-    blockedTiles: Set<string>
+  origin: HexCoordinates,
+  movementPoints: number,
+  blockedTiles: Set<string>,
 ): HexCoordinates[] {
-    const reachableTiles: HexCoordinates[] = []
-    const visited: Set<string> = new Set()
-    const queue: { hex: HexCoordinates; cost: number }[] = [{hex: origin, cost: 0}]
+  const reachableTiles: HexCoordinates[] = [];
+  const visited: Set<string> = new Set();
+  const queue: { hex: HexCoordinates; cost: number }[] = [
+    { hex: origin, cost: 0 },
+  ];
 
-    visited.add(hexToKey(origin))
+  visited.add(hexToKey(origin));
 
-    while (queue.length > 0) {
-        const current = queue.shift()!
-        if (current.cost > 0) {
-            reachableTiles.push(current.hex)
-        }
-
-        if (current.cost < movementPoints) {
-            const neighbors: HexCoordinates[] = getNeighbors(current.hex)
-
-            for (const neighbor of neighbors) {
-                const neighborKey: string = hexToKey(neighbor)
-
-                if (!visited.has(neighborKey) && !blockedTiles.has(neighborKey)) {
-                    visited.add(neighborKey)
-                    queue.push({hex: neighbor, cost: current.cost + 1})
-                }
-            }
-        }
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    if (current.cost > 0) {
+      reachableTiles.push(current.hex);
     }
 
-    return reachableTiles
+    if (current.cost < movementPoints) {
+      const neighbors: HexCoordinates[] = getNeighbors(current.hex);
+
+      for (const neighbor of neighbors) {
+        const neighborKey: string = hexToKey(neighbor);
+
+        if (!visited.has(neighborKey) && !blockedTiles.has(neighborKey)) {
+          visited.add(neighborKey);
+          queue.push({ hex: neighbor, cost: current.cost + 1 });
+        }
+      }
+    }
+  }
+
+  return reachableTiles;
 }
 
 export function filterGridBounds(
-    tiles: HexCoordinates[],
-    isInGrid: (hex: HexCoordinates) => boolean
+  tiles: HexCoordinates[],
+  isInGrid: (hex: HexCoordinates) => boolean,
 ): HexCoordinates[] {
-    return tiles.filter((tile) => isInGrid(tile))
+  return tiles.filter((tile) => isInGrid(tile));
 }
 
 export function getValidMovementTiles(
-    origin: HexCoordinates,
-    movementPoints: number,
-    characters: Character[],
-    isInGrid?: (hex: HexCoordinates) => boolean
+  origin: HexCoordinates,
+  movementPoints: number,
+  characters: Character[],
+  isInGrid?: (hex: HexCoordinates) => boolean,
 ): HexCoordinates[] {
-    const occupiedPositions = new Set<string>()
+  const occupiedPositions = new Set<string>();
 
-    characters.forEach((character) => {
-        occupiedPositions.add(hexToKey(character.hexPosition))
-    })
+  characters.forEach((character) => {
+    occupiedPositions.add(hexToKey(character.hexPosition));
+  });
 
-    occupiedPositions.delete(hexToKey(origin))
+  occupiedPositions.delete(hexToKey(origin));
 
-    let validTiles: HexCoordinates[] = getMovementRangeWithObstacles(origin, movementPoints, occupiedPositions)
+  let validTiles: HexCoordinates[] = getMovementRangeWithObstacles(
+    origin,
+    movementPoints,
+    occupiedPositions,
+  );
 
-    if (isInGrid) {
-        validTiles = filterGridBounds(validTiles, isInGrid)
-    }
+  if (isInGrid) {
+    validTiles = filterGridBounds(validTiles, isInGrid);
+  }
 
-    return validTiles
+  return validTiles;
 }
