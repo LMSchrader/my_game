@@ -5,7 +5,7 @@ import { app } from "../main.ts";
 
 class SceneManager {
   private readonly scenes: Map<SceneType, Scene> = new Map();
-  private currentScene: Scene | undefined;
+  private currentScene?: Scene;
 
   constructor() {
     this.registerScene(new StartScreen());
