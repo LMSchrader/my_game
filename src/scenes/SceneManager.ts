@@ -1,16 +1,14 @@
-import { type Application } from "pixi.js";
 import { type Scene, type SceneType } from "./types/scene.ts";
 import { StartScreen } from "./StartScreen.ts";
 import { GameScene } from "./GameScene.ts";
+import { app } from "../main.ts";
 
-export class SceneManager {
-  private readonly app: Application;
+class SceneManager {
   private readonly scenes: Map<SceneType, Scene> = new Map();
   private currentScene: Scene | undefined;
 
-  constructor(app: Application) {
-    this.app = app;
-    this.registerScene(new StartScreen(this));
+  constructor() {
+    this.registerScene(new StartScreen());
     this.registerScene(new GameScene());
   }
 
@@ -19,13 +17,13 @@ export class SceneManager {
 
     if (this.currentScene) {
       await this.currentScene.onExit();
-      this.app.stage.removeChild(this.currentScene);
+      app.stage.removeChild(this.currentScene);
     }
 
     this.currentScene = scene;
-    this.app.stage.addChild(scene);
+    app.stage.addChild(scene);
     await scene.onEnter();
-    this.handleResize(this.app.screen.width, this.app.screen.height);
+    this.handleResize(app.screen.width, app.screen.height);
   }
 
   public getCurrentScene(): Scene | undefined {
@@ -51,3 +49,5 @@ export class SceneManager {
     }
   }
 }
+
+export const sceneManager = new SceneManager();

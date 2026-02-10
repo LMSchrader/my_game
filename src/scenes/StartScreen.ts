@@ -1,7 +1,6 @@
 import { Assets, Container, Graphics, Sprite, Text } from "pixi.js";
 import { type Scene, SceneType } from "./types/scene.ts";
 import { logger } from "../utils/logger.ts";
-import { SceneManager } from "./SceneManager.ts";
 import {
   FONTSIZE_BIG,
   FONTSIZE_MEDIUM,
@@ -11,21 +10,16 @@ import {
 } from "../config/config.ts";
 import { FancyButton } from "@pixi/ui";
 import { center, scaleToFullSize } from "../utils/uiUtils.ts";
+import { sceneManager } from "./SceneManager.ts";
 
 const BACKGROUND_PATH: string = "/background.png";
 
 export class StartScreen extends Container implements Scene {
   public readonly type: SceneType = SceneType.START;
 
-  private readonly sceneManager: SceneManager;
   private background: Sprite | undefined;
   private titleText: Text | undefined;
   private playButton: FancyButton | undefined;
-
-  constructor(sceneManager: SceneManager) {
-    super();
-    this.sceneManager = sceneManager;
-  }
 
   public async onEnter(): Promise<void> {
     await this.loadBackground();
@@ -100,7 +94,7 @@ export class StartScreen extends Container implements Scene {
     });
 
     this.playButton.onPress.connect(() =>
-      this.sceneManager.switchScene(SceneType.GAME),
+      sceneManager.switchScene(SceneType.GAME),
     );
     this.addChild(this.playButton);
   }
