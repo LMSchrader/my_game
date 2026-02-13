@@ -9,7 +9,6 @@ For new features use
 - /generate-tasks
 After implementation run a code review with
 - /review branch (Opencode build in command)
-- or use /code-review if you want more control over the review prompt
 
 ## Expanding the ESLint configuration
 
