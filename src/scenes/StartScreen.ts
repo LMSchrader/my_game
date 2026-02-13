@@ -9,7 +9,7 @@ import {
 import { FancyButton } from "@pixi/ui";
 import { center, scaleToFullSize } from "../utils/uiUtils.ts";
 import { sceneManager } from "./SceneManager.ts";
-import { GenericButton } from "../ui/GenericButton.ts";
+import { GenericButton } from "../ui/utils/GenericButton.ts";
 import { GameScene } from "./GameScene.ts";
 
 export class StartScreen extends Container implements Scene {

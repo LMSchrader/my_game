@@ -1,6 +1,6 @@
 import { type HexCoordinates } from "./types/grid.ts";
 import { type Character } from "./types/character.ts";
-import { getValidMovementTiles, isValidMove } from "./MovementSystem.ts";
+import { getValidMovementTiles, isValidMove } from "./movementSystem.ts";
 import { Game } from "./Game.ts";
 import { logger } from "../utils/logger.ts";
 import type { HexGrid } from "./HexGrid.ts";

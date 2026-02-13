@@ -1,8 +1,8 @@
-import { type Character, Team } from "../types/character.ts";
-import { getValidMovementTiles } from "../MovementSystem.ts";
-import { Game } from "../Game.ts";
-import { type GridBoundsChecker } from "../types/ai.ts";
-import { logger } from "../../utils/logger.ts";
+import { type Character, Team } from "./types/character.ts";
+import { getValidMovementTiles } from "./movementSystem.ts";
+import { Game } from "./Game.ts";
+import { type GridBoundsChecker } from "./types/ai.ts";
+import { logger } from "../utils/logger.ts";
 
 export class AIController {
   private readonly gameState: Game;

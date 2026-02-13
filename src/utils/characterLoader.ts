@@ -1,4 +1,4 @@
-import { CharacterModel } from "../game/character/CharacterModel.ts";
+import { CharacterModel } from "../game/CharacterModel.ts";
 import { Team } from "../game/types/character.ts";
 
 export async function loadCharacters(): Promise<CharacterModel[]> {

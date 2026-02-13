@@ -4,7 +4,7 @@
 - `src/ai/AIController.ts` - New file: Main AI controller class that listens for turn events
 - `src/scenes/GameScene.ts` - Initialize AIController and pass dependencies
 - `src/turn/TurnManager.ts` - Not modified; AIController listens to its turnStart events
-- `src/movement/MovementSystem.ts` - Used for getting valid movement tiles
+- `src/movement/movementSystem.ts` - Used for getting valid movement tiles
 - `src/utils/hexGridUtils.ts` - Used for calculating hex distances
 - `src/state/GameState.ts` - AIController needs this to get all characters
 - `src/character/types/character.ts` - Character and Team types

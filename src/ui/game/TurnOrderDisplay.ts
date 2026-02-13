@@ -1,6 +1,10 @@
 import { Container, Graphics, Text } from "pixi.js";
-import { type Character, Team } from "../game/types/character.ts";
-import { Colors, FONTSIZE_SMALL, TEXT_COLOR_WHITE } from "../config/config.ts";
+import { type Character, Team } from "../../game/types/character.ts";
+import {
+  Colors,
+  FONTSIZE_SMALL,
+  TEXT_COLOR_WHITE,
+} from "../../config/config.ts";
 
 export class TurnOrderDisplay extends Container {
   private characters: Character[];

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file contains guidelines for agentic coding assistants working on this repository.
+You are a senior developer specialized in game development with TypeScript and Pixi.js.
 
 ## Project Overview
 
@@ -24,9 +24,29 @@ Note: This project does not have automated tests configured. Manual testing requ
 - Vite 7 for bundling
 - Pixi.js 8 for 2D graphics rendering
 - Pixi UI for UI components
+- AssetPack for asset processing
 - Pino for logging
 - ESLint with TypeScript rules
 - Prettier for code formatting
+
+## Architecture
+
+Follow the Model–view–controller pattern. Project structure:
+
+```
+src/
+  config/config.ts     # Default colors, fontsize, text, sprites
+  game/                # Backend logic
+    types/
+  scenes/              # Scenes tying frontend and backend
+    types/
+  ui/                  # UI components (game/, utils/)
+  utils/               # Utilities
+```
+
+## Coding Standards
+
+You always apply KISS, DRY and SOLID in your implementations.
 
 ## Code Style Guidelines
 
@@ -37,12 +57,7 @@ Note: This project does not have automated tests configured. Manual testing requ
 - **Interface vs Type**: Use `interface` for object shapes, `type` for unions/primitives
 - **Const assertions**: Use `as const` for constant objects that should be immutable at compile time
 - **Explicit types**: Always include return types on public methods
-
-### Imports
-
-- Include `.ts` extension in all imports: `import { Foo } from "./bar.ts"`
-- Third-party imports first, then internal imports
-- Group related imports together
+- **Imports**: Include `.ts` extension in all imports. Third-party imports first, then internal. Group related imports together.
 
 ```typescript
 import { ExternalLib } from "external-lib";
@@ -52,20 +67,18 @@ import type { InternalType } from "../internal/types.ts";
 
 ### Naming Conventions
 
-- **Classes**: PascalCase (`GameScene`, `CharacterEntity`)
-- **Interfaces**: PascalCase, descriptive (`Character`, `HexGridConfig`)
+- **Classes, Interfaces, types**: PascalCase (`GameScene`, `Character`, `HexCoordinates`)
 - **Functions/Methods**: camelCase (`getCenteredHexPosition`, `handleClick`)
-- **Private methods**: camelCase with private access modifier
 - **Constants**: UPPER_SNAKE_CASE (`HEX_SIZE`, `DEFAULT_MOVEMENT_POINTS`)
-- **Type types**: PascalCase (`HexCoordinates`, `PixelCoordinates`)
+- **Files containing exactly one class**: PascalCase
+- **All other files (types files and utils)**: camelCase
 
 ### Class Design
 
-- Use `public readonly` for properties that should be set once
+- Use `readonly` for properties that should be set once
 - Use `private` for internal implementation details
 - Constructors accept a single config object for complex initialization
 - Prefer dependency injection via constructor parameters
-- Organize classes by feature module (character/, game/, ui/, utils/)
 
 ### Type Pattern
 
@@ -73,10 +86,10 @@ Store type definitions alongside implementation files in `types/` directories:
 
 ```
 src/
-  character/
+  game/
     types/
       character.ts
-    Character.ts
+    CharacterModel.ts
 ```
 
 Use const assertion pattern for enums:
@@ -89,18 +102,6 @@ export const TeamValues = {
 
 export type Team = (typeof TeamValues)[keyof typeof TeamValues];
 export const Team = TeamValues;
-```
-
-### Error Handling
-
-- Log errors with context using the logger service
-- Use try/catch around async operations
-- Return early when optional values are undefined
-
-```typescript
-if (this.selectedCharacterId === undefined) {
-  return undefined;
-}
 ```
 
 ### Logging
@@ -117,7 +118,6 @@ logger.error(error, "Error message");
 ### Variable Declaration
 
 - Use `const` by default, `let` only when reassignment needed
-- Destructure objects for properties used multiple times
 - Type annotations on declarations
 
 ```typescript
@@ -127,7 +127,6 @@ const { x, y } = pixelPosition;
 
 ### Pixi.js Specific Notes
 
-- Documentation can be found at [documentation/llms.txt](documentation/llms.txt)
 - Graphics items need event mode set: `graphics.eventMode = "static"`
 - Use pixi-pipes for asset processing
 - Assets loaded via bundles managed in `src/utils/assets.ts`
@@ -136,3 +135,8 @@ const { x, y } = pixelPosition;
 
 - Import CSS files in TypeScript: `import "./index.css"`
 
+## Documentation
+
+Pixi.js documentation available at [documentation/llms.txt](documentation/llms.txt)
+
+Refer to this file for comprehensive Pixi.js API reference and guides.
