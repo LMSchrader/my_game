@@ -12,7 +12,7 @@
 - `src/grid/HexGrid.test.ts` - Unit tests for hex grid component
 - `src/state/GameState.ts` - State management for characters and selection
 - `src/state/GameState.test.ts` - Unit tests for game state management
-- `src/movement/MovementSystem.ts` - Movement range calculation and highlighting logic
+- `src/movement/movementSystem.ts` - Movement range calculation and highlighting logic
 - `src/movement/MovementSystem.test.ts` - Unit tests for movement system
 - `src/interaction/InteractionHandler.ts` - Click handling, character selection, and movement execution
 - `src/interaction/InteractionHandler.test.ts` - Unit tests for interaction handler

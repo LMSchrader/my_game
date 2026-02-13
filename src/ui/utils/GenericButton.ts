@@ -1,6 +1,6 @@
 import { FancyButton } from "@pixi/ui";
 import { Graphics, Text } from "pixi.js";
-import { FONTSIZE_MEDIUM, TEXT_COLOR_WHITE } from "../config/config.ts";
+import { FONTSIZE_MEDIUM, TEXT_COLOR_WHITE } from "../../config/config.ts";
 
 const defaultButtonOptions = {
   text: "",

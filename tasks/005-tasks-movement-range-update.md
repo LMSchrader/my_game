@@ -1,7 +1,7 @@
 ## Relevant Files
 
 - `src/utils/hexGridUtils.ts` - Contains existing hex grid utilities; will need new A* pathfinding function added here
-- `src/movement/MovementSystem.ts` - Contains current movement range calculation functions; needs to be updated to use pathfinding
+- `src/movement/movementSystem.ts` - Contains current movement range calculation functions; needs to be updated to use pathfinding
 - `src/character/Character.ts` - Contains character information used to identify blocked tiles
 - `src/grid/HexGrid.ts` - Provides hex grid functionality and tile validation methods
 
@@ -31,7 +31,7 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 1.5 Add early termination if no path exists or if max iterations exceeded (e.g., 1000 iterations)
   - [x] 1.6 Return the path as an array of HexCoordinates or null if no valid path exists
 - [x] 2.0 Update movement range calculation to use pathfinding
-  - [x] 2.1 Create new function `getMovementRangeWithObstacles()` in `src/movement/MovementSystem.ts` that accepts origin, movement points, and blocked tiles
+  - [x] 2.1 Create new function `getMovementRangeWithObstacles()` in `src/movement/movementSystem.ts` that accepts origin, movement points, and blocked tiles
   - [x] 2.2 Implement BFS/flood-fill algorithm starting from origin, tracking movement points used
   - [x] 2.3 For each tile, use the blocked tiles Set to check if it's reachable without passing through obstacles
   - [x] 2.4 Only include tiles in the result if they can be reached within the movement point budget

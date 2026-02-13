@@ -52,7 +52,7 @@ src/ai/
 #### Integration Points:
 - **GameScene.ts**: Initialize AIController after TurnManager initialization
 - **TurnManager.ts**: No changes required (already emits turnStart events)
-- **MovementSystem.ts**: Use existing `getValidMovementTiles()` function
+- **movementSystem.ts**: Use existing `getValidMovementTiles()` function
 - **InteractionHandler.ts**: No changes required (Team B characters already non-selectable)
 
 ### 4. Technical Specifications
@@ -106,7 +106,7 @@ private executeAITurn(character: Character): void {
 #### Dependencies:
 - Type: `Character` from `character/types/character.ts`
 - Type: `HexCoordinates` from `grid/types/grid.ts`
-- Function: `getValidMovementTiles` from `movement/MovementSystem.ts`
+- Function: `getValidMovementTiles` from `movement/movementSystem.ts`
 - Function: `getHexDistance` from `utils/hexGridUtils.ts`
 - Class: `TurnManager` from `turn/TurnManager.ts`
 - Interface: `GameState` from `state/GameState.ts`

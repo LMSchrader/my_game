@@ -1,6 +1,9 @@
 import { Container, Graphics, Sprite } from "pixi.js";
-import { type CharacterModel } from "./CharacterModel.ts";
-import { type HexCoordinates, type PixelCoordinates } from "../types/grid.ts";
+import { type CharacterModel } from "../../game/CharacterModel.ts";
+import {
+  type HexCoordinates,
+  type PixelCoordinates,
+} from "../../game/types/grid.ts";
 import { createOutline } from "../../utils/hexGridUtils.ts";
 import { Colors, DEFAULT_SPRITE_SCALE } from "../../config/config.ts";
 
@@ -31,30 +34,22 @@ export class CharacterView extends Container {
     this.createSelectionHighlight();
     this.createTeamBorder();
     this.createActiveGlow();
-    this.updateSpritePosition();
 
     this.sprite = Sprite.from(this.model.spritePath);
     this.sprite.anchor.set(0.5);
     this.sprite.scale.set(this.spriteScale);
     this.addChild(this.sprite);
 
-    this.syncWithModel();
+    this.updateSpritePosition();
+    this.updateSelectionState();
+    this.updateActiveTurnState();
     this.setupModelListeners();
   }
 
   private setupModelListeners(): void {
-    this.model.on("positionChanged", () => this.updatePosition());
-    this.model.on("selectionChanged", () => this.syncWithModel());
-    this.model.on("turnStateChanged", () => this.syncWithModel());
-  }
-
-  private syncWithModel(): void {
-    this.updateSelectionState();
-    this.updateActiveTurnState();
-  }
-
-  public updatePosition(): void {
-    this.updateSpritePosition();
+    this.model.on("positionChanged", () => this.updateSpritePosition());
+    this.model.on("selectionChanged", () => this.updateSelectionState());
+    this.model.on("turnStateChanged", () => this.updateActiveTurnState());
   }
 
   private updateSpritePosition(): void {

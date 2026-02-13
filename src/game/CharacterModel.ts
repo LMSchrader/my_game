@@ -1,7 +1,7 @@
-import { type Character, Team } from "../types/character.ts";
-import { type HexCoordinates } from "../types/grid.ts";
+import { type Character, Team } from "./types/character.ts";
+import { type HexCoordinates } from "./types/grid.ts";
 import { EventEmitter } from "pixi.js";
-import { DEFAULT_MOVEMENT_POINTS, DEFAULT_SPEED } from "../../config/config.ts";
+import { DEFAULT_MOVEMENT_POINTS, DEFAULT_SPEED } from "../config/config.ts";
 
 export class CharacterModel extends EventEmitter implements Character {
   public readonly id: string;
