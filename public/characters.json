@@ -1,0 +1,18 @@
+[
+  {
+    "id": "cat-1",
+    "name": "Whiskers",
+    "team": "TeamA",
+    "speed": 6,
+    "maxMovementPoints": 2,
+    "spritePath": "character.png"
+  },
+  {
+    "id": "enemy-1",
+    "name": "Shadow Beast",
+    "team": "TeamB",
+    "speed": 4,
+    "maxMovementPoints": 2,
+    "spritePath": "enemy.png"
+  }
+]

@@ -17,6 +17,7 @@ export interface Character {
   name: string;
   team: Team;
   speed: number;
+  spritePath: string;
   setPosition(hexPosition: HexCoordinates): void;
   move(hexPosition: HexCoordinates): void;
   resetMovementPoints(): void;

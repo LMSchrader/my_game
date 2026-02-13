@@ -1,6 +1,7 @@
 import { Container, Sprite } from "pixi.js";
 import { type Scene } from "./types/scene.ts";
-import { CharacterEntity, Team } from "../game/character/Character.ts";
+import { CharacterModel } from "../game/character/CharacterModel.ts";
+import { CharacterView } from "../game/character/CharacterView.ts";
 import { type Character } from "../game/types/character.ts";
 import { i18n, SpritePaths } from "../config/config.ts";
 import { TurnOrderDisplay } from "../ui/TurnOrderDisplay.ts";
@@ -12,6 +13,7 @@ import { Game } from "../game/Game.ts";
 import type { HexCoordinates } from "../game/types/grid.ts";
 import { HexGrid } from "../game/HexGrid.ts";
 import { InteractionHandler } from "../game/InteractionHandler.ts";
+import { loadCharacters } from "../utils/characterLoader.ts";
 
 export class GameScene extends Container implements Scene {
   public static readonly assetBundles = ["common", "game"];
@@ -34,8 +36,6 @@ export class GameScene extends Container implements Scene {
     this.grid = new HexGrid();
     this.addChild(this.grid);
 
-    this.initializeCharacters();
-
     this.turnOrderDisplay = new TurnOrderDisplay();
     this.addChild(this.turnOrderDisplay);
 
@@ -50,7 +50,9 @@ export class GameScene extends Container implements Scene {
     this.subscribeToClickEvents();
     this.subscribeToTurnEvents();
 
-    this.game.start();
+    this.initializeCharacters().then(() => {
+      this.game.start();
+    });
   }
 
   onEnter(): Promise<void> | void {}
@@ -76,35 +78,31 @@ export class GameScene extends Container implements Scene {
     this.turnOrderDisplay.y = 20;
   }
 
-  private initializeCharacters() {
-    const character = new CharacterEntity({
-      id: "cat-1",
-      hexPosition: { q: 0, r: 0 },
-      name: "Whiskers",
-      team: Team.TeamA,
-      speed: 6,
-      spriteScale: 5,
-      positionProvider: this.grid,
-      spritePath: SpritePaths.CHARACTER,
-    });
-    this.addCharacter(character);
+  private async initializeCharacters(): Promise<void> {
+    const characterModels = await loadCharacters();
+    const characterPositions: Record<string, HexCoordinates> = {
+      "cat-1": { q: 0, r: 0 },
+      "enemy-1": { q: 2, r: 1 },
+    };
 
-    const enemy = new CharacterEntity({
-      id: "enemy-1",
-      hexPosition: { q: 2, r: 1 },
-      name: "Shadow Beast",
-      team: Team.TeamB,
-      speed: 4,
-      spriteScale: 5,
-      positionProvider: this.grid,
-      spritePath: SpritePaths.ENEMY,
+    characterModels.forEach((model) => {
+      const hexPosition = characterPositions[model.id];
+      if (hexPosition) {
+        model.setPosition(hexPosition);
+      }
+
+      const view = new CharacterView({
+        model,
+        spriteScale: 5,
+        positionProvider: this.grid,
+      });
+      this.addCharacter(model, view);
     });
-    this.addCharacter(enemy);
   }
 
-  private addCharacter(character: CharacterEntity): void {
-    this.grid.addChild(character);
-    this.game.addCharacter(character);
+  private addCharacter(model: CharacterModel, view: CharacterView): void {
+    this.grid.addChild(view);
+    this.game.addCharacter(model);
   }
 
   private subscribeToClickEvents() {
