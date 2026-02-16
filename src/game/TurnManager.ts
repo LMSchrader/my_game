@@ -1,16 +1,16 @@
 import { EventEmitter } from "pixi.js";
 import { type Character, Team } from "./types/character.ts";
-import { type TurnEvent, type TurnQueue } from "./types/turn.ts";
+import { type TurnQueue } from "./types/turn.ts";
 import { logger } from "../utils/logger.ts";
 import type { Game } from "./Game.ts";
 
-export class TurnManager {
+export class TurnManager extends EventEmitter {
   private readonly game: Game;
   private currentTurnIndex: number = 0;
-  private readonly emitter: EventEmitter = new EventEmitter();
   private turnOrder: string[] = [];
 
   public constructor(game: Game) {
+    super();
     this.game = game;
   }
 
@@ -77,25 +77,7 @@ export class TurnManager {
       .filter((c): c is Character => c !== undefined);
   }
 
-  public on(event: TurnEvent, callback: (...args: unknown[]) => void): void {
-    this.emitter.on(event, callback);
-  }
-
-  public off(event: TurnEvent, callback: (...args: unknown[]) => void): void {
-    this.emitter.off(event, callback);
-  }
-
-  public reset(): void {
-    this.emitter.removeAllListeners();
-    this.turnOrder = [];
-    this.currentTurnIndex = 0;
-  }
-
   private calculateTurnOrder(characters: Character[]): TurnQueue {
     return [...characters].sort((a, b) => b.speed - a.speed);
-  }
-
-  private emit(event: TurnEvent, ...args: unknown[]): void {
-    this.emitter.emit(event, ...args);
   }
 }

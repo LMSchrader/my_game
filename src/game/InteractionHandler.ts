@@ -1,22 +1,17 @@
 import { type HexCoordinates } from "./types/grid.ts";
 import { type Character } from "./types/character.ts";
-import { getValidMovementTiles, isValidMove } from "./movementSystem.ts";
+import { isValidMove } from "./movementSystem.ts";
 import { Game } from "./Game.ts";
 import { logger } from "../utils/logger.ts";
-import type { HexGridView } from "../ui/game/HexGridView.ts";
+import type { HexGridModel } from "./HexGridModel.ts";
 
 export class InteractionHandler {
   private readonly game: Game;
-  private readonly grid: HexGridView;
+  private readonly hexGridModel: HexGridModel;
 
-  constructor(game: Game, grid: HexGridView) {
+  constructor(game: Game, hexGridModel: HexGridModel) {
     this.game = game;
-    this.grid = grid;
-  }
-
-  public handleGlobalClick(): void {
-    this.game.deselectCharacter();
-    this.grid.clearHighlights();
+    this.hexGridModel = hexGridModel;
   }
 
   public handleHexClick(hex: HexCoordinates): void {
@@ -44,10 +39,8 @@ export class InteractionHandler {
 
     if (selectedCharacter?.id === clickedCharacter.id) {
       this.game.deselectCharacter();
-      this.grid.clearHighlights();
     } else {
       this.game.selectCharacter(clickedCharacter.id);
-      this.showMovementRange(clickedCharacter);
     }
   }
 
@@ -64,7 +57,6 @@ export class InteractionHandler {
         `${selectedCharacter.name} cannot move: not active character or wrong team`,
       );
       this.game.deselectCharacter();
-      this.grid.clearHighlights();
       return;
     }
 
@@ -72,11 +64,14 @@ export class InteractionHandler {
       this.executeMove(selectedCharacter, hex);
     } else {
       this.game.deselectCharacter();
-      this.grid.clearHighlights();
     }
   }
 
   private isValidMove(hex: HexCoordinates, character: Character): boolean {
+    if (!this.hexGridModel.isHexInGrid(hex)) {
+      return false;
+    }
+
     const allCharacters = this.game.getAllCharacters();
     return isValidMove(
       character.hexPosition,
@@ -92,24 +87,8 @@ export class InteractionHandler {
   ): void {
     character.move(newHexPosition);
 
-    this.grid.clearHighlights();
-
-    if (character.movementPoints > 0) {
-      this.showMovementRange(character);
-    } else {
+    if (character.movementPoints <= 0) {
       this.game.deselectCharacter();
     }
-  }
-
-  private showMovementRange(character: Character): void {
-    const allCharacters = this.game.getAllCharacters();
-    const movementTiles = getValidMovementTiles(
-      character.hexPosition,
-      character.movementPoints,
-      allCharacters,
-      (hex) => this.grid.isHexInGrid(hex),
-    );
-
-    this.grid.highlightTiles(movementTiles);
   }
 }

@@ -1,13 +1,17 @@
+import { EventEmitter } from "pixi.js";
 import { type Character, Team } from "./types/character.ts";
 import { type HexCoordinates } from "./types/grid.ts";
 import { TurnManager } from "./TurnManager.ts";
 
-export class Game {
+export type GameEvent = "characterSelected" | "characterDeselected";
+
+export class Game extends EventEmitter {
   public readonly turnManager: TurnManager;
   private readonly characters: Map<string, Character> = new Map();
   private selectedCharacterId?: string;
 
   public constructor() {
+    super();
     this.turnManager = new TurnManager(this);
   }
 
@@ -45,12 +49,14 @@ export class Game {
     if (selectedCharacter) {
       this.selectedCharacterId = characterId;
       selectedCharacter.setSelected(true);
+      this.emit("characterSelected", selectedCharacter);
     }
   }
 
   public deselectCharacter(): void {
     this.getSelectedCharacter()?.setSelected(false);
     this.selectedCharacterId = undefined;
+    this.emit("characterDeselected");
   }
 
   public getSelectedCharacter(): Character | undefined {
