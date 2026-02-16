@@ -51,6 +51,7 @@ export class TurnManager extends EventEmitter {
       logger.debug(
         `${currentCharacter.name} movement points reset to ${currentCharacter.maxMovementPoints}`,
       );
+      this.game.deselectCharacter();
       this.emit("turnEnd", currentCharacter);
       logger.debug(`Ended turn for ${currentCharacter.name}`);
     }
