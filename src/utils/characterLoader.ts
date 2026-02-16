@@ -13,6 +13,7 @@ export async function loadCharacters(): Promise<CharacterModel[]> {
         speed?: number;
         maxMovementPoints?: number;
         spritePath: string;
+        hexPosition?: { q: number; r: number };
       }) =>
         new CharacterModel({
           ...charData,

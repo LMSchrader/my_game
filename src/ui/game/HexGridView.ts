@@ -11,22 +11,18 @@ import {
   pixelToHex,
 } from "../../utils/hexGridUtils.ts";
 import { Colors, HEX_SIZE } from "../../config/config.ts";
-import type { HexGridModel } from "../../game/HexGridModel.ts";
 import { getValidMovementTiles } from "../../game/movementSystem.ts";
 import type { Game } from "../../game/Game.ts";
 
 export class HexGridView extends Container {
-  private readonly model: HexGridModel;
   private readonly game: Game;
   private readonly tiles: Map<string, Graphics> = new Map();
   private readonly highlights: Map<string, Graphics> = new Map();
-  private onClick?: (hex: HexCoordinates) => void;
   private centerX: number = 0;
   private centerY: number = 0;
 
-  constructor(model: HexGridModel, game: Game) {
+  constructor(game: Game) {
     super();
-    this.model = model;
     this.game = game;
     this.subscribeToGameEvents();
     this.setupEventListeners();
@@ -52,10 +48,6 @@ export class HexGridView extends Container {
     this.on("pointerdown", this.handleClick.bind(this));
   }
 
-  public setOnClick(handler: (hex: HexCoordinates) => void): void {
-    this.onClick = handler;
-  }
-
   private handleClick(event: FederatedPointerEvent): void {
     const localPosition: PixelCoordinates = this.toLocal(event.global);
     const adjustedPosition: PixelCoordinates = {
@@ -63,7 +55,7 @@ export class HexGridView extends Container {
       y: localPosition.y + this.centerY,
     };
     const hex: HexCoordinates = pixelToHex(adjustedPosition);
-    this.onClick?.(hex);
+    this.game.interactionHandler.handleHexClick(hex);
   }
 
   private renderGrid(): void {
@@ -74,7 +66,7 @@ export class HexGridView extends Container {
 
     const tilePositions: Map<string, PixelCoordinates> = new Map();
 
-    this.model.forEachTiles((tile) => {
+    this.game.hexGridModel.forEachTiles((tile) => {
       const hex: HexCoordinates = tile.coordinates;
       const pixel: PixelCoordinates = hexToPixel(hex);
       minX = Math.min(minX, pixel.x);
@@ -134,7 +126,7 @@ export class HexGridView extends Container {
     this.clearHighlights();
 
     hexes.forEach((hex) => {
-      if (this.model.isHexInGrid(hex)) {
+      if (this.game.hexGridModel.isHexInGrid(hex)) {
         const highlight: Graphics = this.createHighlightOverlay(hex, color);
         this.addChild(highlight);
         this.highlights.set(hexToKey(hex), highlight);
@@ -174,7 +166,7 @@ export class HexGridView extends Container {
       character.hexPosition,
       character.movementPoints,
       allCharacters,
-      (hex) => this.model.isHexInGrid(hex),
+      (hex) => this.game.hexGridModel.isHexInGrid(hex),
     );
 
     this.highlightTiles(movementTiles);

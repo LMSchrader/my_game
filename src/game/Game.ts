@@ -2,20 +2,38 @@ import { EventEmitter } from "pixi.js";
 import { type Character, Team } from "./types/character.ts";
 import { type HexCoordinates } from "./types/grid.ts";
 import { TurnManager } from "./TurnManager.ts";
+import { HexGridModel, type HexGridConfig } from "./HexGridModel.ts";
+import { InteractionHandler } from "./InteractionHandler.ts";
+import { AIController } from "./AIController.ts";
+import type { GridBoundsChecker } from "./types/ai.ts";
+import { loadCharacters } from "../utils/characterLoader.ts";
 
 export type GameEvent = "characterSelected" | "characterDeselected";
 
 export class Game extends EventEmitter {
   public readonly turnManager: TurnManager;
+  public readonly hexGridModel: HexGridModel;
+  public readonly interactionHandler: InteractionHandler;
   private readonly characters: Map<string, Character> = new Map();
   private selectedCharacterId?: string;
 
-  public constructor() {
+  public constructor(gridConfig: HexGridConfig) {
     super();
+    this.hexGridModel = new HexGridModel(gridConfig);
     this.turnManager = new TurnManager(this);
+    this.interactionHandler = new InteractionHandler(this);
+
+    const gridBoundsChecker: GridBoundsChecker = (hex) =>
+      this.hexGridModel.isHexInGrid(hex);
+    new AIController(this, gridBoundsChecker);
   }
 
-  public start(): void {
+  public async start(): Promise<void> {
+    const characterModels = await loadCharacters();
+    characterModels.forEach((model) => {
+      this.addCharacter(model);
+    });
+
     this.turnManager.initializeTurnOrder(this.getAllCharacters());
   }
 

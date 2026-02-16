@@ -4,22 +4,16 @@ import { CharacterModel } from "../game/CharacterModel.ts";
 import { CharacterView } from "../ui/game/CharacterView.ts";
 import { i18n, SpritePaths, DEFAULT_GRID_CONFIG } from "../config/config.ts";
 import { TurnOrderDisplay } from "../ui/game/TurnOrderDisplay.ts";
-import { AIController } from "../game/AIController.ts";
 import { center, scaleToFullSize } from "../utils/uiUtils.ts";
 import { FancyButton } from "@pixi/ui";
 import { GenericButton } from "../ui/utils/GenericButton.ts";
 import { Game } from "../game/Game.ts";
-import type { HexCoordinates } from "../game/types/grid.ts";
 import { HexGridView } from "../ui/game/HexGridView.ts";
-import { HexGridModel } from "../game/HexGridModel.ts";
-import { InteractionHandler } from "../game/InteractionHandler.ts";
-import { loadCharacters } from "../utils/characterLoader.ts";
 
 export class GameScene extends Container implements Scene {
   public static readonly assetBundles = ["common", "game"];
 
   private readonly game: Game;
-  private readonly interactionHandler: InteractionHandler;
   private readonly background: Sprite;
   private readonly grid: HexGridView;
   private readonly endTurnButton: FancyButton;
@@ -28,15 +22,12 @@ export class GameScene extends Container implements Scene {
   constructor() {
     super();
 
-    this.game = new Game();
-    const gridModel = new HexGridModel(DEFAULT_GRID_CONFIG);
-    this.interactionHandler = new InteractionHandler(this.game, gridModel);
-    new AIController(this.game, (hex) => gridModel.isHexInGrid(hex));
+    this.game = new Game(DEFAULT_GRID_CONFIG);
 
     this.background = Sprite.from(SpritePaths.BACKGROUND);
     this.addChild(this.background);
 
-    this.grid = new HexGridView(gridModel, this.game);
+    this.grid = new HexGridView(this.game);
     this.addChild(this.grid);
 
     this.turnOrderDisplay = new TurnOrderDisplay(this.game.turnManager);
@@ -49,8 +40,8 @@ export class GameScene extends Container implements Scene {
     this.subscribeToClickEvents();
     this.subscribeToTurnEvents();
 
-    this.initializeCharacters().then(() => {
-      this.game.start();
+    this.game.start().then(() => {
+      this.initializeCharacterViews();
     });
   }
 
@@ -77,40 +68,22 @@ export class GameScene extends Container implements Scene {
     this.turnOrderDisplay.y = 20;
   }
 
-  private async initializeCharacters(): Promise<void> {
-    const characterModels = await loadCharacters();
-    const characterPositions: Record<string, HexCoordinates> = {
-      "cat-1": { q: 0, r: 0 },
-      "enemy-1": { q: 2, r: 1 },
-    };
+  private initializeCharacterViews(): void {
+    const characters = this.game.getAllCharacters();
 
-    characterModels.forEach((model) => {
-      const hexPosition = characterPositions[model.id];
-      if (hexPosition) {
-        model.setPosition(hexPosition);
-      }
-
+    characters.forEach((model) => {
       const view = new CharacterView({
-        model,
+        model: model as CharacterModel,
         spriteScale: 5,
         positionProvider: this.grid,
       });
-      this.addCharacter(model, view);
+      this.grid.addChild(view);
     });
-  }
-
-  private addCharacter(model: CharacterModel, view: CharacterView): void {
-    this.grid.addChild(view);
-    this.game.addCharacter(model);
   }
 
   private subscribeToClickEvents() {
     this.background.eventMode = "static";
     this.background.on("pointerdown", () => this.game.deselectCharacter());
-
-    this.grid.setOnClick((hex: HexCoordinates) => {
-      this.interactionHandler.handleHexClick(hex);
-    });
   }
 
   private subscribeToTurnEvents() {
