@@ -3,6 +3,7 @@ import type {
   HexCoordinates,
   PixelCoordinates,
 } from "../../game/types/grid.ts";
+import { type Character } from "../../game/types/character.ts";
 import {
   getHexCorners,
   hexToKey,
@@ -11,20 +12,39 @@ import {
 } from "../../utils/hexGridUtils.ts";
 import { Colors, HEX_SIZE } from "../../config/config.ts";
 import type { HexGridModel } from "../../game/HexGridModel.ts";
+import { getValidMovementTiles } from "../../game/movementSystem.ts";
+import type { Game } from "../../game/Game.ts";
 
 export class HexGridView extends Container {
   private readonly model: HexGridModel;
+  private readonly game: Game;
   private readonly tiles: Map<string, Graphics> = new Map();
   private readonly highlights: Map<string, Graphics> = new Map();
   private onClick?: (hex: HexCoordinates) => void;
   private centerX: number = 0;
   private centerY: number = 0;
 
-  constructor(model: HexGridModel) {
+  constructor(model: HexGridModel, game: Game) {
     super();
     this.model = model;
+    this.game = game;
+    this.subscribeToGameEvents();
     this.setupEventListeners();
     this.renderGrid();
+  }
+
+  private subscribeToGameEvents(): void {
+    this.game.on("characterSelected", (character: Character) => {
+      this.showMovementRange(character);
+    });
+
+    this.game.on("characterDeselected", () => {
+      this.clearHighlights();
+    });
+
+    this.game.turnManager.on("turnEnd", () => {
+      this.clearHighlights();
+    });
   }
 
   private setupEventListeners(): void {
@@ -114,7 +134,7 @@ export class HexGridView extends Container {
     this.clearHighlights();
 
     hexes.forEach((hex) => {
-      if (this.isHexInGrid(hex)) {
+      if (this.model.isHexInGrid(hex)) {
         const highlight: Graphics = this.createHighlightOverlay(hex, color);
         this.addChild(highlight);
         this.highlights.set(hexToKey(hex), highlight);
@@ -148,7 +168,15 @@ export class HexGridView extends Container {
     return highlight;
   }
 
-  public isHexInGrid(hex: HexCoordinates): boolean {
-    return this.model.isHexInGrid(hex);
+  private showMovementRange(character: Character): void {
+    const allCharacters = this.game.getAllCharacters();
+    const movementTiles = getValidMovementTiles(
+      character.hexPosition,
+      character.movementPoints,
+      allCharacters,
+      (hex) => this.model.isHexInGrid(hex),
+    );
+
+    this.highlightTiles(movementTiles);
   }
 }

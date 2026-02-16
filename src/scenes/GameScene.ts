@@ -29,12 +29,14 @@ export class GameScene extends Container implements Scene {
     super();
 
     this.game = new Game();
+    const gridModel = new HexGridModel(DEFAULT_GRID_CONFIG);
+    this.interactionHandler = new InteractionHandler(this.game, gridModel);
+    new AIController(this.game, (hex) => gridModel.isHexInGrid(hex));
 
     this.background = Sprite.from(SpritePaths.BACKGROUND);
     this.addChild(this.background);
 
-    const gridModel = new HexGridModel(DEFAULT_GRID_CONFIG);
-    this.grid = new HexGridView(gridModel);
+    this.grid = new HexGridView(gridModel, this.game);
     this.addChild(this.grid);
 
     this.turnOrderDisplay = new TurnOrderDisplay(this.game.turnManager);
@@ -43,10 +45,6 @@ export class GameScene extends Container implements Scene {
     this.endTurnButton = new GenericButton({ text: i18n.END_TURN });
     this.endTurnButton.onPress.connect(() => this.game.turnManager.endTurn());
     this.addChild(this.endTurnButton);
-
-    this.interactionHandler = new InteractionHandler(this.game, this.grid);
-
-    new AIController(this.game, (hex) => this.grid.isHexInGrid(hex));
 
     this.subscribeToClickEvents();
     this.subscribeToTurnEvents();
@@ -108,9 +106,7 @@ export class GameScene extends Container implements Scene {
 
   private subscribeToClickEvents() {
     this.background.eventMode = "static";
-    this.background.on("pointerdown", () =>
-      this.interactionHandler.handleGlobalClick(),
-    );
+    this.background.on("pointerdown", () => this.game.deselectCharacter());
 
     this.grid.setOnClick((hex: HexCoordinates) => {
       this.interactionHandler.handleHexClick(hex);
@@ -121,11 +117,6 @@ export class GameScene extends Container implements Scene {
     const turnManager = this.game.turnManager;
     turnManager.on("turnStart", () => {
       this.updateButtonState();
-    });
-
-    turnManager.on("turnEnd", () => {
-      this.grid.clearHighlights();
-      this.game.deselectCharacter();
     });
   }
 
