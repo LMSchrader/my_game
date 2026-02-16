@@ -5,8 +5,10 @@ import {
   FONTSIZE_SMALL,
   TEXT_COLOR_WHITE,
 } from "../../config/config.ts";
+import type { TurnManager } from "../../game/TurnManager.ts";
 
 export class TurnOrderDisplay extends Container {
+  private readonly turnManager: TurnManager;
   private characters: Character[];
   private readonly characterCards: Map<string, Graphics> = new Map();
   private readonly characterTexts: Map<string, Text> = new Map();
@@ -14,10 +16,40 @@ export class TurnOrderDisplay extends Container {
   private readonly cardHeight: number = 60;
   private readonly cardSpacing: number = 10;
   private readonly padding: number = 15;
+  private readonly turnOrderInitializedHandler: () => void;
+  private readonly turnStartHandler: (character: unknown) => void;
 
-  constructor() {
+  constructor(turnManager: TurnManager) {
     super();
     this.characters = [];
+    this.turnManager = turnManager;
+    this.turnOrderInitializedHandler =
+      this.handleTurnOrderInitialized.bind(this);
+    this.turnStartHandler = this.handleTurnStart.bind(this);
+    this.subscribeToTurnEvents();
+  }
+
+  public override destroy(options?: {
+    children?: boolean;
+    texture?: boolean;
+    baseTexture?: boolean;
+  }): void {
+    this.unsubscribeFromTurnEvents();
+    super.destroy(options);
+  }
+
+  private handleTurnOrderInitialized(): void {
+    const turnQueue = this.turnManager.getTurnQueue();
+    this.updateTurnOrder(turnQueue);
+    const activeCharacter = this.turnManager.getActiveCharacter();
+    if (activeCharacter) {
+      this.setActiveCharacter(activeCharacter.id);
+    }
+  }
+
+  private handleTurnStart(character: unknown): void {
+    const activeChar = character as Character;
+    this.setActiveCharacter(activeChar.id);
   }
 
   public updateTurnOrder(characters: Character[]): void {
@@ -106,5 +138,21 @@ export class TurnOrderDisplay extends Container {
         }
       }
     });
+  }
+
+  private subscribeToTurnEvents(): void {
+    this.turnManager.on(
+      "turnOrderInitialized",
+      this.turnOrderInitializedHandler,
+    );
+    this.turnManager.on("turnStart", this.turnStartHandler);
+  }
+
+  private unsubscribeFromTurnEvents(): void {
+    this.turnManager.off(
+      "turnOrderInitialized",
+      this.turnOrderInitializedHandler,
+    );
+    this.turnManager.off("turnStart", this.turnStartHandler);
   }
 }
