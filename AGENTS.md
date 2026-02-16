@@ -31,7 +31,7 @@ Note: This project does not have automated tests configured. Manual testing requ
 
 ## Architecture
 
-Follow the Model–view–controller pattern. Project structure:
+Follow the Model–view–controller and Observer pattern. Project structure:
 
 ```
 src/
@@ -43,6 +43,9 @@ src/
   ui/                  # UI components (game/, utils/)
   utils/               # Utilities
 ```
+
+Entry point for the backend logic is [Game](/src/game/Game.ts). 
+Model classes that notify observer should extend EventEmitter, see [CharacterModel](/src/game/CharacterModel.ts).
 
 ## Coding Standards
 

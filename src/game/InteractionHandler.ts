@@ -3,15 +3,12 @@ import { type Character } from "./types/character.ts";
 import { isValidMove } from "./movementSystem.ts";
 import { Game } from "./Game.ts";
 import { logger } from "../utils/logger.ts";
-import type { HexGridModel } from "./HexGridModel.ts";
 
 export class InteractionHandler {
   private readonly game: Game;
-  private readonly hexGridModel: HexGridModel;
 
-  constructor(game: Game, hexGridModel: HexGridModel) {
+  constructor(game: Game) {
     this.game = game;
-    this.hexGridModel = hexGridModel;
   }
 
   public handleHexClick(hex: HexCoordinates): void {
@@ -68,7 +65,7 @@ export class InteractionHandler {
   }
 
   private isValidMove(hex: HexCoordinates, character: Character): boolean {
-    if (!this.hexGridModel.isHexInGrid(hex)) {
+    if (!this.game.hexGridModel.isHexInGrid(hex)) {
       return false;
     }
 
