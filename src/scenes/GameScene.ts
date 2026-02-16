@@ -2,7 +2,6 @@ import { Container, Sprite } from "pixi.js";
 import { type Scene } from "./types/scene.ts";
 import { CharacterModel } from "../game/CharacterModel.ts";
 import { CharacterView } from "../ui/game/CharacterView.ts";
-import { type Character } from "../game/types/character.ts";
 import { i18n, SpritePaths, DEFAULT_GRID_CONFIG } from "../config/config.ts";
 import { TurnOrderDisplay } from "../ui/game/TurnOrderDisplay.ts";
 import { AIController } from "../game/AIController.ts";
@@ -38,7 +37,7 @@ export class GameScene extends Container implements Scene {
     this.grid = new HexGridView(gridModel);
     this.addChild(this.grid);
 
-    this.turnOrderDisplay = new TurnOrderDisplay();
+    this.turnOrderDisplay = new TurnOrderDisplay(this.game.turnManager);
     this.addChild(this.turnOrderDisplay);
 
     this.endTurnButton = new GenericButton({ text: i18n.END_TURN });
@@ -120,20 +119,7 @@ export class GameScene extends Container implements Scene {
 
   private subscribeToTurnEvents() {
     const turnManager = this.game.turnManager;
-    turnManager.on("turnOrderInitialized", () => {
-      const turnQueue = turnManager.getTurnQueue();
-      this.turnOrderDisplay.updateTurnOrder(turnQueue);
-      const activeCharacter = turnManager.getActiveCharacter();
-      if (activeCharacter) {
-        this.turnOrderDisplay.setActiveCharacter(activeCharacter.id);
-      }
-    });
-
-    turnManager.on("turnStart", (character: unknown) => {
-      const activeChar = character as Character;
-      if (activeChar.id) {
-        this.turnOrderDisplay.setActiveCharacter(activeChar.id);
-      }
+    turnManager.on("turnStart", () => {
       this.updateButtonState();
     });
 
