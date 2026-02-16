@@ -3,13 +3,13 @@ import { type Character } from "./types/character.ts";
 import { getValidMovementTiles, isValidMove } from "./movementSystem.ts";
 import { Game } from "./Game.ts";
 import { logger } from "../utils/logger.ts";
-import type { HexGrid } from "./HexGrid.ts";
+import type { HexGridView } from "../ui/game/HexGridView.ts";
 
 export class InteractionHandler {
   private readonly game: Game;
-  private readonly grid: HexGrid;
+  private readonly grid: HexGridView;
 
-  constructor(game: Game, grid: HexGrid) {
+  constructor(game: Game, grid: HexGridView) {
     this.game = game;
     this.grid = grid;
   }

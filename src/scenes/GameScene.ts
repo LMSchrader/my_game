@@ -3,7 +3,7 @@ import { type Scene } from "./types/scene.ts";
 import { CharacterModel } from "../game/CharacterModel.ts";
 import { CharacterView } from "../ui/game/CharacterView.ts";
 import { type Character } from "../game/types/character.ts";
-import { i18n, SpritePaths } from "../config/config.ts";
+import { i18n, SpritePaths, DEFAULT_GRID_CONFIG } from "../config/config.ts";
 import { TurnOrderDisplay } from "../ui/game/TurnOrderDisplay.ts";
 import { AIController } from "../game/AIController.ts";
 import { center, scaleToFullSize } from "../utils/uiUtils.ts";
@@ -11,7 +11,8 @@ import { FancyButton } from "@pixi/ui";
 import { GenericButton } from "../ui/utils/GenericButton.ts";
 import { Game } from "../game/Game.ts";
 import type { HexCoordinates } from "../game/types/grid.ts";
-import { HexGrid } from "../game/HexGrid.ts";
+import { HexGridView } from "../ui/game/HexGridView.ts";
+import { HexGridModel } from "../game/HexGridModel.ts";
 import { InteractionHandler } from "../game/InteractionHandler.ts";
 import { loadCharacters } from "../utils/characterLoader.ts";
 
@@ -21,7 +22,7 @@ export class GameScene extends Container implements Scene {
   private readonly game: Game;
   private readonly interactionHandler: InteractionHandler;
   private readonly background: Sprite;
-  private readonly grid: HexGrid;
+  private readonly grid: HexGridView;
   private readonly endTurnButton: FancyButton;
   private readonly turnOrderDisplay: TurnOrderDisplay;
 
@@ -33,7 +34,8 @@ export class GameScene extends Container implements Scene {
     this.background = Sprite.from(SpritePaths.BACKGROUND);
     this.addChild(this.background);
 
-    this.grid = new HexGrid();
+    const gridModel = new HexGridModel(DEFAULT_GRID_CONFIG);
+    this.grid = new HexGridView(gridModel);
     this.addChild(this.grid);
 
     this.turnOrderDisplay = new TurnOrderDisplay();

@@ -1,29 +1,28 @@
 import { Container, FederatedPointerEvent, Graphics } from "pixi.js";
-import { type HexCoordinates, type PixelCoordinates } from "./types/grid.ts";
+import type {
+  HexCoordinates,
+  PixelCoordinates,
+} from "../../game/types/grid.ts";
 import {
   getHexCorners,
   hexToKey,
   hexToPixel,
   pixelToHex,
-} from "../utils/hexGridUtils.ts";
-import { Colors, DEFAULT_GRID_CONFIG, HEX_SIZE } from "../config/config.ts";
+} from "../../utils/hexGridUtils.ts";
+import { Colors, HEX_SIZE } from "../../config/config.ts";
+import type { HexGridModel } from "../../game/HexGridModel.ts";
 
-export interface HexGridConfig {
-  rows: number;
-  cols: number;
-}
-
-export class HexGrid extends Container {
+export class HexGridView extends Container {
+  private readonly model: HexGridModel;
   private readonly tiles: Map<string, Graphics> = new Map();
   private readonly highlights: Map<string, Graphics> = new Map();
   private onClick?: (hex: HexCoordinates) => void;
-  private readonly config: HexGridConfig;
   private centerX: number = 0;
   private centerY: number = 0;
 
-  constructor(config: HexGridConfig = DEFAULT_GRID_CONFIG) {
+  constructor(model: HexGridModel) {
     super();
-    this.config = config;
+    this.model = model;
     this.setupEventListeners();
     this.renderGrid();
   }
@@ -55,17 +54,15 @@ export class HexGrid extends Container {
 
     const tilePositions: Map<string, PixelCoordinates> = new Map();
 
-    for (let row = 0; row < this.config.rows; row++) {
-      for (let col = 0; col < this.config.cols; col++) {
-        const hex: HexCoordinates = this.offsetToAxial(col, row);
-        const pixel: PixelCoordinates = hexToPixel(hex);
-        minX = Math.min(minX, pixel.x);
-        maxX = Math.max(maxX, pixel.x);
-        minY = Math.min(minY, pixel.y);
-        maxY = Math.max(maxY, pixel.y);
-        tilePositions.set(hexToKey(hex), pixel);
-      }
-    }
+    this.model.forEachTiles((tile) => {
+      const hex: HexCoordinates = tile.coordinates;
+      const pixel: PixelCoordinates = hexToPixel(hex);
+      minX = Math.min(minX, pixel.x);
+      maxX = Math.max(maxX, pixel.x);
+      minY = Math.min(minY, pixel.y);
+      maxY = Math.max(maxY, pixel.y);
+      tilePositions.set(hexToKey(hex), pixel);
+    });
 
     const centerX: number = (minX + maxX) / 2;
     const centerY: number = (minY + maxY) / 2;
@@ -92,30 +89,6 @@ export class HexGrid extends Container {
     };
   }
 
-  private offsetToAxial(col: number, row: number): HexCoordinates {
-    const q: number = col - (row - (row & 1)) / 2;
-    const r: number = row;
-    return { q, r };
-  }
-
-  private axialToOffset(q: number, r: number): { col: number; row: number } {
-    const col: number = q + (r - (r & 1)) / 2;
-    return { col, row: r };
-  }
-
-  public isHexInGrid(hex: HexCoordinates): boolean {
-    const offset: { col: number; row: number } = this.axialToOffset(
-      hex.q,
-      hex.r,
-    );
-    return (
-      offset.col >= 0 &&
-      offset.col < this.config.cols &&
-      offset.row >= 0 &&
-      offset.row < this.config.rows
-    );
-  }
-
   private createHexTile(center: PixelCoordinates): Graphics {
     const graphics: Graphics = new Graphics();
     graphics.eventMode = "static";
@@ -132,11 +105,6 @@ export class HexGrid extends Container {
     graphics.stroke({ width: 1, color: Colors.TILE_STROKE });
 
     return graphics;
-  }
-
-  public getTile(hex: HexCoordinates): Graphics | undefined {
-    const key: string = hexToKey(hex);
-    return this.tiles.get(key) ?? undefined;
   }
 
   public highlightTiles(
@@ -180,7 +148,7 @@ export class HexGrid extends Container {
     return highlight;
   }
 
-  public isTileHighlighted(hex: HexCoordinates): boolean {
-    return this.highlights.has(hexToKey(hex));
+  public isHexInGrid(hex: HexCoordinates): boolean {
+    return this.model.isHexInGrid(hex);
   }
 }

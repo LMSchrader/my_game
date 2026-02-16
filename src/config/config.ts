@@ -1,4 +1,4 @@
-import { type HexGridConfig } from "../game/HexGrid.ts";
+import { type HexGridConfig } from "../game/HexGridModel.ts";
 
 export const i18n = {
   GAME_TITLE: "My Game",
