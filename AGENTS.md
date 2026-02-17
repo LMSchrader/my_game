@@ -46,6 +46,7 @@ src/
 
 Entry point for the backend logic is [Game](/src/game/Game.ts). 
 Model classes that notify observer should extend EventEmitter, see [CharacterModel](/src/game/CharacterModel.ts).
+Listeners should be implemented in the UI component, see [TurnOrderDisplay](/src/ui/game/TurnOrderDisplay.ts)
 
 ## Coding Standards
 

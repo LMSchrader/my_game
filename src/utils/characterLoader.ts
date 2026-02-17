@@ -1,5 +1,6 @@
 import { CharacterModel } from "../game/CharacterModel.ts";
 import { Team } from "../game/types/character.ts";
+import { DEFAULT_CARDS } from "../config/cards.ts";
 
 export async function loadCharacters(): Promise<CharacterModel[]> {
   try {
@@ -18,6 +19,7 @@ export async function loadCharacters(): Promise<CharacterModel[]> {
         new CharacterModel({
           ...charData,
           team: charData.team === "TeamA" ? Team.TeamA : Team.TeamB,
+          deck: DEFAULT_CARDS,
         }),
     );
   } catch (error) {

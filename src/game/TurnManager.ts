@@ -3,6 +3,7 @@ import { type Character, Team } from "./types/character.ts";
 import { type TurnQueue } from "./types/turn.ts";
 import { logger } from "../utils/logger.ts";
 import type { Game } from "./Game.ts";
+import { CARDS_DRAWN_PER_TURN } from "../config/config.ts";
 
 export class TurnManager extends EventEmitter {
   private readonly game: Game;
@@ -26,16 +27,9 @@ export class TurnManager extends EventEmitter {
       },
       "Turn order initialized",
     );
-    this.getActiveCharacter()?.setActiveTurn(true);
     this.emit("turnOrderInitialized");
-  }
 
-  public getActiveCharacter(): Character | undefined {
-    if (this.turnOrder.length === 0) {
-      return undefined;
-    }
-    const characterId = this.turnOrder[this.currentTurnIndex];
-    return this.game.getAllCharacters().find((c) => c.id === characterId);
+    this.startTurn();
   }
 
   public endTurn(): void {
@@ -45,30 +39,55 @@ export class TurnManager extends EventEmitter {
     }
 
     const currentCharacter = this.getActiveCharacter();
-    if (currentCharacter) {
-      currentCharacter.resetMovementPoints();
-      currentCharacter.setActiveTurn(false);
-      logger.debug(
-        `${currentCharacter.name} movement points reset to ${currentCharacter.maxMovementPoints}`,
-      );
-      this.game.deselectCharacter();
-      this.emit("turnEnd", currentCharacter);
-      logger.debug(`Ended turn for ${currentCharacter.name}`);
-    }
+    currentCharacter.returnCards();
+    this.emit("cardsReturned", currentCharacter);
+    currentCharacter.resetMovementPoints();
+    currentCharacter.setActiveTurn(false);
+    logger.debug(
+      `${currentCharacter.name} movement points reset to ${currentCharacter.maxMovementPoints}`,
+    );
+    this.game.deselectCharacter();
+    this.emit("turnEnd", currentCharacter);
+    logger.debug(`Ended turn for ${currentCharacter.name}`);
 
     this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
 
-    const newActiveCharacter = this.getActiveCharacter();
-    if (newActiveCharacter) {
-      newActiveCharacter.setActiveTurn(true);
-      this.emit("turnStart", newActiveCharacter);
-      logger.debug(`Started turn for ${newActiveCharacter.name}`);
+    this.startTurn();
+  }
+
+  private startTurn(): void {
+    const activeCharacter = this.getActiveCharacter();
+    activeCharacter.setActiveTurn(true);
+
+    if (activeCharacter.getDeck().length === 0) {
+      logger.warn(`${activeCharacter.name} has an empty deck - no cards drawn`);
+    } else {
+      const drawnCards = activeCharacter.drawCards(CARDS_DRAWN_PER_TURN);
+      this.emit("cardsDrawn", activeCharacter, drawnCards);
+      logger.debug(`${activeCharacter.name} drew ${drawnCards.length} cards`);
     }
+
+    this.emit("turnStart", activeCharacter);
+    logger.debug(`Started turn for ${activeCharacter.name}`);
+  }
+
+  public getActiveCharacter(): Character {
+    if (this.turnOrder.length === 0) {
+      throw new Error(`Turn order is empty`);
+    }
+    const characterId = this.turnOrder[this.currentTurnIndex];
+    const activeCharacter = this.game
+      .getAllCharacters()
+      .find((c) => c.id === characterId);
+    if (!activeCharacter) {
+      throw new Error(`Character with id ${characterId} is unknown`);
+    }
+    return activeCharacter;
   }
 
   public isPlayerTurn(): boolean {
     const activeCharacter = this.getActiveCharacter();
-    return activeCharacter?.team === Team.TeamA;
+    return activeCharacter.team === Team.TeamA;
   }
 
   public getTurnQueue(): TurnQueue {

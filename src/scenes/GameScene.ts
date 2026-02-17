@@ -9,6 +9,7 @@ import { FancyButton } from "@pixi/ui";
 import { GenericButton } from "../ui/utils/GenericButton.ts";
 import { Game } from "../game/Game.ts";
 import { HexGridView } from "../ui/game/HexGridView.ts";
+import { CardHand } from "../ui/game/CardHand.ts";
 
 export class GameScene extends Container implements Scene {
   public static readonly assetBundles = ["common", "game"];
@@ -18,6 +19,7 @@ export class GameScene extends Container implements Scene {
   private readonly grid: HexGridView;
   private readonly endTurnButton: FancyButton;
   private readonly turnOrderDisplay: TurnOrderDisplay;
+  private readonly cardHand: CardHand;
 
   constructor() {
     super();
@@ -26,6 +28,8 @@ export class GameScene extends Container implements Scene {
 
     this.background = Sprite.from(SpritePaths.BACKGROUND);
     this.addChild(this.background);
+    this.background.eventMode = "static";
+    this.background.on("pointerdown", () => this.game.deselectCharacter());
 
     this.grid = new HexGridView(this.game);
     this.addChild(this.grid);
@@ -33,12 +37,15 @@ export class GameScene extends Container implements Scene {
     this.turnOrderDisplay = new TurnOrderDisplay(this.game.turnManager);
     this.addChild(this.turnOrderDisplay);
 
+    this.cardHand = new CardHand(this.game.turnManager);
+    this.addChild(this.cardHand);
+
     this.endTurnButton = new GenericButton({ text: i18n.END_TURN });
     this.endTurnButton.onPress.connect(() => this.game.turnManager.endTurn());
     this.addChild(this.endTurnButton);
-
-    this.subscribeToClickEvents();
-    this.subscribeToTurnEvents();
+    this.game.turnManager.on("turnStart", () => {
+      this.updateButtonState();
+    });
 
     this.game.start().then(() => {
       this.initializeCharacterViews();
@@ -61,11 +68,14 @@ export class GameScene extends Container implements Scene {
 
     center(this.grid, width, height);
 
-    this.endTurnButton.x = width / 2;
-    this.endTurnButton.y = height - 100;
+    this.endTurnButton.x = width - 125;
+    this.endTurnButton.y = height - 50;
 
     this.turnOrderDisplay.x = 20;
     this.turnOrderDisplay.y = 20;
+
+    this.cardHand.x = width / 2;
+    this.cardHand.y = height - 80;
   }
 
   private initializeCharacterViews(): void {
@@ -79,18 +89,6 @@ export class GameScene extends Container implements Scene {
         game: this.game,
       });
       this.grid.addChild(view);
-    });
-  }
-
-  private subscribeToClickEvents() {
-    this.background.eventMode = "static";
-    this.background.on("pointerdown", () => this.game.deselectCharacter());
-  }
-
-  private subscribeToTurnEvents() {
-    const turnManager = this.game.turnManager;
-    turnManager.on("turnStart", () => {
-      this.updateButtonState();
     });
   }
 

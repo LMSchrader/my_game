@@ -1,4 +1,5 @@
 import { type HexCoordinates } from "./grid.ts";
+import type { Card } from "./card.ts";
 
 export const TeamValues = {
   TeamA: "TeamA",
@@ -18,10 +19,16 @@ export interface Character {
   team: Team;
   speed: number;
   spritePath: string;
+  deck: Card[];
+  drawnCards: Card[];
   setPosition(hexPosition: HexCoordinates): void;
   move(hexPosition: HexCoordinates): void;
   resetMovementPoints(): void;
   hasEnoughMovementPoints(points: number): boolean;
   setActiveTurn(isActive: boolean): void;
   isActiveTurn(): boolean;
+  getDeck(): Card[];
+  getDrawnCards(): Card[];
+  drawCards(count: number): Card[];
+  returnCards(): void;
 }

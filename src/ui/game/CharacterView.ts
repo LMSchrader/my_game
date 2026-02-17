@@ -15,7 +15,7 @@ export interface PositionProvider {
 export class CharacterView extends Container {
   private readonly model: CharacterModel;
   private readonly spriteScale: number;
-  private readonly positionProvider?: PositionProvider;
+  private readonly positionProvider: PositionProvider;
   private readonly game: Game;
 
   private readonly sprite: Sprite;

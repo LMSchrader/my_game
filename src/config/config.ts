@@ -21,6 +21,7 @@ export const DEFAULT_GRID_CONFIG: HexGridConfig = {
 export const DEFAULT_MOVEMENT_POINTS: number = 2;
 export const DEFAULT_SPRITE_SCALE: number = 0.5;
 export const DEFAULT_SPEED: number = 5;
+export const CARDS_DRAWN_PER_TURN: number = 3;
 
 export const Colors = {
   PLAYER: 0x3b82f6,

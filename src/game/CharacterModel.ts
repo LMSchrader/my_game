@@ -1,5 +1,6 @@
 import { type Character, Team } from "./types/character.ts";
 import { type HexCoordinates } from "./types/grid.ts";
+import type { Card } from "./types/card.ts";
 import { EventEmitter } from "pixi.js";
 import { DEFAULT_MOVEMENT_POINTS, DEFAULT_SPEED } from "../config/config.ts";
 
@@ -12,6 +13,8 @@ export class CharacterModel extends EventEmitter implements Character {
   public readonly team: Team;
   public readonly speed: number;
   public readonly spritePath: string;
+  public readonly deck: Card[];
+  public drawnCards: Card[];
 
   private activeTurn: boolean = false;
 
@@ -24,6 +27,7 @@ export class CharacterModel extends EventEmitter implements Character {
     team?: Team;
     speed?: number;
     spritePath: string;
+    deck: Card[];
   }) {
     super();
     this.id = config.id;
@@ -35,6 +39,8 @@ export class CharacterModel extends EventEmitter implements Character {
     this.team = config.team ?? Team.TeamA;
     this.speed = config.speed ?? DEFAULT_SPEED;
     this.spritePath = config.spritePath;
+    this.deck = [...config.deck];
+    this.drawnCards = [];
   }
 
   public setPosition(hexPosition: HexCoordinates): void {
@@ -62,5 +68,40 @@ export class CharacterModel extends EventEmitter implements Character {
 
   public isActiveTurn(): boolean {
     return this.activeTurn;
+  }
+
+  public getDeck(): Card[] {
+    return this.deck;
+  }
+
+  public getDrawnCards(): Card[] {
+    return this.drawnCards;
+  }
+
+  public drawCards(count: number): Card[] {
+    this.shuffleDeck();
+    const drawn: Card[] = [];
+    for (let i = 0; i < count && this.deck.length > 0; i++) {
+      const card = this.deck.shift();
+      if (card) {
+        drawn.push(card);
+        this.drawnCards.push(card);
+      }
+    }
+    return drawn;
+  }
+
+  public returnCards(): void {
+    for (const card of this.drawnCards) {
+      this.deck.push(card);
+    }
+    this.drawnCards = [];
+  }
+
+  private shuffleDeck(): void {
+    for (let i = this.deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
+    }
   }
 }
