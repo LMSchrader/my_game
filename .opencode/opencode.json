@@ -9,5 +9,14 @@
       ],
       "enabled": true
     }
+  },
+  "permission": {
+    "bash": {
+      "*": "ask",
+      "git *": "allow",
+      "npm *": "allow",
+      "grep *": "allow"
+    },
+    "squash-wip-commits": "allow"
   }
 }
