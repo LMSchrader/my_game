@@ -61,18 +61,14 @@ export class Game extends EventEmitter {
   }
 
   public selectCharacter(characterId: string): void {
-    this.getSelectedCharacter()?.setSelected(false);
-
     const selectedCharacter = this.characters.get(characterId);
     if (selectedCharacter) {
       this.selectedCharacterId = characterId;
-      selectedCharacter.setSelected(true);
       this.emit("characterSelected", selectedCharacter);
     }
   }
 
   public deselectCharacter(): void {
-    this.getSelectedCharacter()?.setSelected(false);
     this.selectedCharacterId = undefined;
     this.emit("characterDeselected");
   }

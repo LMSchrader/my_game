@@ -6,6 +6,7 @@ import {
 } from "../../game/types/grid.ts";
 import { createOutline } from "../../utils/hexGridUtils.ts";
 import { Colors, DEFAULT_SPRITE_SCALE } from "../../config/config.ts";
+import { type Game } from "../../game/Game.ts";
 
 export interface PositionProvider {
   getCenteredHexPosition: (hex: HexCoordinates) => PixelCoordinates;
@@ -15,6 +16,7 @@ export class CharacterView extends Container {
   private readonly model: CharacterModel;
   private readonly spriteScale: number;
   private readonly positionProvider?: PositionProvider;
+  private readonly game: Game;
 
   private readonly sprite: Sprite;
   private selectionHighlight?: Graphics;
@@ -23,13 +25,15 @@ export class CharacterView extends Container {
 
   constructor(config: {
     model: CharacterModel;
+    game: Game;
+    positionProvider: PositionProvider;
     spriteScale?: number;
-    positionProvider?: PositionProvider;
   }) {
     super();
     this.model = config.model;
-    this.spriteScale = config.spriteScale ?? DEFAULT_SPRITE_SCALE;
     this.positionProvider = config.positionProvider;
+    this.game = config.game;
+    this.spriteScale = config.spriteScale ?? DEFAULT_SPRITE_SCALE;
 
     this.createSelectionHighlight();
     this.createTeamBorder();
@@ -43,13 +47,14 @@ export class CharacterView extends Container {
     this.updateSpritePosition();
     this.updateSelectionState();
     this.updateActiveTurnState();
-    this.setupModelListeners();
+    this.setupListeners();
   }
 
-  private setupModelListeners(): void {
+  private setupListeners(): void {
     this.model.on("positionChanged", () => this.updateSpritePosition());
-    this.model.on("selectionChanged", () => this.updateSelectionState());
     this.model.on("turnStateChanged", () => this.updateActiveTurnState());
+    this.game.on("characterSelected", () => this.updateSelectionState());
+    this.game.on("characterDeselected", () => this.updateSelectionState());
   }
 
   private updateSpritePosition(): void {
@@ -63,7 +68,8 @@ export class CharacterView extends Container {
 
   private updateSelectionState(): void {
     if (this.selectionHighlight) {
-      this.selectionHighlight.visible = this.model.isSelected();
+      const selectedCharacter = this.game.getSelectedCharacter();
+      this.selectionHighlight.visible = selectedCharacter?.id === this.model.id;
     }
   }
 

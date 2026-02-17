@@ -76,6 +76,7 @@ export class GameScene extends Container implements Scene {
         model: model as CharacterModel,
         spriteScale: 5,
         positionProvider: this.grid,
+        game: this.game,
       });
       this.grid.addChild(view);
     });
