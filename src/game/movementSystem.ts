@@ -53,7 +53,7 @@ export function getValidMovementTiles(
   origin: HexCoordinates,
   movementPoints: number,
   characters: Character[],
-  isInGrid?: (hex: HexCoordinates) => boolean,
+  isInGrid: (hex: HexCoordinates) => boolean,
 ): HexCoordinates[] {
   const occupiedPositions = new Set<string>();
 
@@ -63,17 +63,13 @@ export function getValidMovementTiles(
 
   occupiedPositions.delete(hexToKey(origin));
 
-  let validTiles: HexCoordinates[] = getMovementRangeWithObstacles(
+  const validTiles: HexCoordinates[] = getMovementRangeWithObstacles(
     origin,
     movementPoints,
     occupiedPositions,
   );
 
-  if (isInGrid) {
-    validTiles = filterGridBounds(validTiles, isInGrid);
-  }
-
-  return validTiles;
+  return filterGridBounds(validTiles, isInGrid);
 }
 
 export function isValidMove(

@@ -1,8 +1,5 @@
 # Turn based tactic game with hex grid and cards
 
-## Open todos
-- Implement cards
-
 ## Working with Opencode
 For new features use 
 - /create-prd

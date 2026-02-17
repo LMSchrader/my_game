@@ -42,9 +42,7 @@ export class TurnOrderDisplay extends Container {
     const turnQueue = this.turnManager.getTurnQueue();
     this.updateTurnOrder(turnQueue);
     const activeCharacter = this.turnManager.getActiveCharacter();
-    if (activeCharacter) {
-      this.setActiveCharacter(activeCharacter.id);
-    }
+    this.setActiveCharacter(activeCharacter.id);
   }
 
   private handleTurnStart(character: unknown): void {

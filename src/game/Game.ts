@@ -86,7 +86,7 @@ export class Game extends EventEmitter {
 
   private isActiveCharacter(character: Character): boolean {
     const activeCharacter = this.turnManager.getActiveCharacter();
-    return activeCharacter?.id === character.id;
+    return activeCharacter.id === character.id;
   }
 
   private isPlayerTeam(character: Character): boolean {
