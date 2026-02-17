@@ -12,10 +12,9 @@
   },
   "permission": {
     "bash": {
-      "*": "ask",
-      "git *": "allow",
-      "npm *": "allow",
-      "grep *": "allow"
+      "*": "allow",
+      "git commit *": "ask",
+      "git push *": "deny"
     },
     "squash-wip-commits": "allow"
   }
