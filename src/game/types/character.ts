@@ -22,8 +22,6 @@ export interface Character {
   move(hexPosition: HexCoordinates): void;
   resetMovementPoints(): void;
   hasEnoughMovementPoints(points: number): boolean;
-  setSelected(isSelected: boolean): void;
-  isSelected(): boolean;
   setActiveTurn(isActive: boolean): void;
   isActiveTurn(): boolean;
 }

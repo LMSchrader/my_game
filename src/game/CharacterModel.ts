@@ -13,7 +13,6 @@ export class CharacterModel extends EventEmitter implements Character {
   public readonly speed: number;
   public readonly spritePath: string;
 
-  private selected: boolean = false;
   private activeTurn: boolean = false;
 
   constructor(config: {
@@ -54,15 +53,6 @@ export class CharacterModel extends EventEmitter implements Character {
 
   public hasEnoughMovementPoints(points: number): boolean {
     return this.movementPoints >= points;
-  }
-
-  public setSelected(isSelected: boolean): void {
-    this.selected = isSelected;
-    this.emit("selectionChanged");
-  }
-
-  public isSelected(): boolean {
-    return this.selected;
   }
 
   public setActiveTurn(isActive: boolean): void {
