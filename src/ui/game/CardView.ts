@@ -1,24 +1,26 @@
-import { Container, Graphics, Text } from "pixi.js";
-import {
-  FONTSIZE_SMALL,
-  TEXT_COLOR_WHITE,
-  Colors,
-} from "../../config/config.ts";
+import { Container, Sprite, Text } from "pixi.js";
+import { FONTSIZE_SMALL, TEXT_COLOR_WHITE } from "../../config/config.ts";
+import { app } from "../../main.ts";
 import type { Card } from "../../game/types/card.ts";
 
 export class CardView extends Container {
   private readonly card: Card;
-  private readonly background: Graphics;
+  private readonly cardSprite: Sprite;
   private readonly cardName: Text;
   private readonly cardDescription: Text;
   private readonly cardWidth: number = 120;
   private readonly cardHeight: number = 160;
-  private isHovered: boolean = false;
+  private readonly hoverOffset: number = 20;
+  private readonly animationSpeed: number = 0.2;
+
+  private targetY: number = 0;
+  private baseY: number = 0;
+  private tickerCallback: (() => void) | null = null;
 
   public constructor(card: Card) {
     super();
     this.card = card;
-    this.background = new Graphics();
+    this.cardSprite = Sprite.from(card.spritePath);
     this.cardName = new Text({
       text: card.name,
       style: { fontSize: 16, fill: TEXT_COLOR_WHITE },
@@ -38,18 +40,23 @@ export class CardView extends Container {
   }
 
   private setupCard(): void {
-    this.background.rect(0, 0, this.cardWidth, this.cardHeight);
-    this.background.fill(0x4a5568);
-    this.background.stroke({ width: 2, color: 0x718096 });
-    this.background.eventMode = "static";
+    this.cardSprite.anchor.set(0, 0);
+    this.cardSprite.width = this.cardWidth;
+    this.cardSprite.height = this.cardHeight;
+    this.cardSprite.eventMode = "static";
 
-    this.cardName.x = 10;
-    this.cardName.y = 10;
+    this.cardName.anchor.set(0.5);
+    this.cardName.x = this.cardWidth / 2;
+    this.cardName.y = 25;
 
-    this.cardDescription.x = 10;
-    this.cardDescription.y = 40;
+    this.cardDescription.anchor.set(0.5);
+    this.cardDescription.x = this.cardWidth / 2;
+    this.cardDescription.y = 55;
 
-    this.addChild(this.background, this.cardName, this.cardDescription);
+    this.addChild(this.cardSprite, this.cardName, this.cardDescription);
+
+    this.baseY = this.y;
+    this.targetY = this.y;
   }
 
   private setupInteractions(): void {
@@ -62,25 +69,41 @@ export class CardView extends Container {
   }
 
   private handleHover(): void {
-    if (this.isHovered) {
+    this.targetY = this.baseY - this.hoverOffset;
+    this.startAnimation();
+  }
+
+  private startAnimation(): void {
+    if (this.tickerCallback !== null) {
       return;
     }
-    this.isHovered = true;
-    this.background.clear();
-    this.background.rect(0, 0, this.cardWidth, this.cardHeight);
-    this.background.fill(Colors.SELECTED_CHARACTER);
-    this.background.stroke({ width: 2, color: TEXT_COLOR_WHITE });
+    this.tickerCallback = (): void => {
+      const diff = this.targetY - this.y;
+      if (Math.abs(diff) < 0.5) {
+        this.y = this.targetY;
+        this.stopAnimation();
+        return;
+      }
+      this.y += diff * this.animationSpeed;
+    };
+    app.ticker.add(this.tickerCallback);
   }
 
   private handleHoverEnd(): void {
-    if (!this.isHovered) {
-      return;
+    this.targetY = this.baseY;
+    this.startAnimation();
+  }
+
+  private stopAnimation(): void {
+    if (this.tickerCallback !== null) {
+      app.ticker.remove(this.tickerCallback);
+      this.tickerCallback = null;
     }
-    this.isHovered = false;
-    this.background.clear();
-    this.background.rect(0, 0, this.cardWidth, this.cardHeight);
-    this.background.fill(0x4a5568);
-    this.background.stroke({ width: 2, color: 0x718096 });
+  }
+
+  public override destroy(options?: import("pixi.js").DestroyOptions): void {
+    this.stopAnimation();
+    super.destroy(options);
   }
 
   private handleClick(): void {

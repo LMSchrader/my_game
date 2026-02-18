@@ -12,7 +12,7 @@ import { HexGridView } from "../ui/game/HexGridView.ts";
 import { CardHand } from "../ui/game/CardHand.ts";
 
 export class GameScene extends Container implements Scene {
-  public static readonly assetBundles = ["common", "game"];
+  public static readonly assetBundles = ["common", "characters", "cards"];
 
   private readonly game: Game;
   private readonly background: Sprite;
@@ -75,7 +75,7 @@ export class GameScene extends Container implements Scene {
     this.turnOrderDisplay.y = 20;
 
     this.cardHand.x = width / 2;
-    this.cardHand.y = height - 80;
+    this.cardHand.y = height - 180;
   }
 
   private initializeCharacterViews(): void {
