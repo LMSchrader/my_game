@@ -37,4 +37,5 @@ export const SpritePaths = {
   CHARACTER: "character.png",
   ENEMY: "enemy.png",
   BACKGROUND: "background.png",
+  CARD_BASE: "cardBase.png",
 } as const;
